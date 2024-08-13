@@ -1,15 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-booking-form',
-//   templateUrl: './booking-form.component.html',
-//   styleUrl: './booking-form.component.scss'
-// })
-// export class BookingFormComponent {
-
-// }
-
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -19,7 +7,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./booking-form.component.scss']
 })
 export class BookingFormComponent implements OnInit {
-  // isLinear = true;
   userTypeFormGroup: FormGroup;
   bookingForm: FormGroup;
   customerForm: FormGroup;
@@ -28,6 +15,7 @@ export class BookingFormComponent implements OnInit {
   roomToBeBooked: any;
   isExistingUser = false;
   existingEmails: string[] = [];
+  currentBooking: any[] = [];
 
   _formBuilder: FormBuilder = new FormBuilder;
 
@@ -37,12 +25,9 @@ export class BookingFormComponent implements OnInit {
   secondFormGroup = this._formBuilder.group({
     secondCtrl: ['', Validators.required],
   });
-  isLinear = false;
 
   constructor(private fb: FormBuilder) {
-
     
-
     const roomData = history.state.room;
 
     this.bookingForm = this.fb.group({
@@ -63,7 +48,6 @@ export class BookingFormComponent implements OnInit {
         stayDateTo: roomData.stayDateTo,
         pricePerDayPerPerson: roomData.pricePerDayPerPerson
       });
-
       this.bookingForm.patchValue({ reservationId: this.generateReservationId() });
     }
 
@@ -73,7 +57,7 @@ export class BookingFormComponent implements OnInit {
     });
 
     this.customerForm = this._formBuilder.group({
-      customerId: [''],
+      customerId:  [{ value: this.generateCustomerId(), disabled: true }],
       name: [''],
       email: [''],
       mobileNumber: [''],
@@ -94,7 +78,17 @@ export class BookingFormComponent implements OnInit {
     });
 
     this.loadExistingEmails();
-    
+
+    this.userTypeFormGroup.get('userType')?.valueChanges.subscribe(value => {
+      this.isExistingUser = (value === 'existing');
+      if (this.isExistingUser) {
+        this.userTypeFormGroup.get('existingEmail')?.setValidators(Validators.required);
+      } else {
+        this.userTypeFormGroup.get('existingEmail')?.clearValidators();
+        this.customerForm.reset();  // Clear any pre-filled data when switching to 'new'
+      }
+      this.userTypeFormGroup.get('existingEmail')?.updateValueAndValidity();
+    });
   }
 
   ngOnInit(): void {}
@@ -116,16 +110,21 @@ export class BookingFormComponent implements OnInit {
     const userType = this.userTypeFormGroup.get('userType')?.value;
     if (userType === 'existing') {
       this.isExistingUser = true;
+      this.customerForm.reset(); // Clear the form when switching to an existing user
     } else {
       this.isExistingUser = false;
+      const newCustomerId = this.generateCustomerId();
+      this.customerForm.get('customerId')?.setValue(newCustomerId);
+      this.customerForm.get('customerId')?.disable();
     }
   }
-
+  
   onEmailChange() {
     const selectedEmail = this.userTypeFormGroup.get('existingEmail')?.value;
     const customerData = this.getCustomerDataByEmail(selectedEmail);
     if (customerData) {
       this.customerForm.patchValue(customerData);
+      this.customerForm.get('customerId')?.disable(); // Disable customerId when selecting an existing user
     }
   }
 
@@ -141,7 +140,7 @@ export class BookingFormComponent implements OnInit {
     }
     return null;
   }
-
+  
   updateTotalPrice() {
     const totalGuests = this.bookingForm.get('totalGuests')?.value || 0;
     const pricePerDayPerPerson = this.bookingForm.get('pricePerDayPerPerson')?.value || 0;
@@ -175,7 +174,7 @@ export class BookingFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const bookings = [];
+    const bookings = [];    
     const customers = [];
     const bookingData = {
       bookingInfo: this.bookingForm.getRawValue(),
@@ -185,6 +184,8 @@ export class BookingFormComponent implements OnInit {
     const customerInfo = this.customerForm.getRawValue();
     localStorage.setItem(customerInfo.customerId, JSON.stringify(customerInfo));
     localStorage.setItem('booking_' + bookingData.bookingInfo.reservationId, JSON.stringify(bookingData));
+    this.currentBooking.push(bookingData);
+    console.log(this.currentBooking);
     alert('Booking Successful!');
 
     for(let i=0;i < localStorage.length;i++){
@@ -198,7 +199,6 @@ export class BookingFormComponent implements OnInit {
       }
 
     }
-
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith('booking_')) {
@@ -209,13 +209,8 @@ export class BookingFormComponent implements OnInit {
         }
       }
     }
-  
     console.log('All Bookings:', bookings);
     console.log('All Customers:', customers);
   }
-  
-
-  
-
-  
 }
+

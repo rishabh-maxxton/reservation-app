@@ -1,7 +1,4 @@
-<!-- <button mat-raised-button (click)="isLinear = !isLinear" id="toggle-linear">
-  {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
-</button> -->
-<mat-stepper [linear]="isLinear" #stepper>
+<mat-stepper #stepper>
   <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>Booking Information</ng-template>
       <div id="bookingInfo" >
@@ -49,30 +46,32 @@
     <mat-step [stepControl]="userTypeFormGroup">
       <ng-template matStepLabel>User Type</ng-template>
       <div id="userType">
-        <form [formGroup]="userTypeFormGroup" (ngSubmit)="onUserTypeSubmit()">
-          <div class="form-group">
-            <label for="userType">Are you a new or existing user?</label>
-            <select id="userType" formControlName="userType" class="form-control">
-              <option value="new">New User</option>
-              <option value="existing">Existing User</option>
-            </select>
-          </div>
-          
+        <form [formGroup]="userTypeFormGroup">
+          <mat-form-field>
+            <mat-label>User Type</mat-label>
+            <mat-select formControlName="userType" (selectionChange)="onUserTypeSubmit()">
+              <mat-option value="new">New User</mat-option>
+              <mat-option value="existing">Existing User</mat-option>
+            </mat-select>
+          </mat-form-field>
           <div *ngIf="isExistingUser">
-            <label for="existingEmail">Select your email</label>
-            <select id="existingEmail" formControlName="existingEmail" class="form-control" (change)="onEmailChange()">
-              <option *ngFor="let email of existingEmails" [value]="email">{{ email }}</option>
-            </select>
+            <mat-form-field>
+              <mat-label>Select Email</mat-label>
+              <mat-select formControlName="existingEmail" (selectionChange)="onEmailChange()">
+                <mat-option *ngFor="let email of existingEmails" [value]="email">
+                  {{ email }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-          
           <div>
+            <button mat-button matStepperPrevious>Back</button>
             <button type="submit" mat-button matStepperNext>Next</button>
+
           </div>
         </form>
       </div>
     </mat-step>
-    
-      
   </mat-step>
   <mat-step [stepControl]="secondFormGroup" label="Customer Information">
     <div id="customerInfo">
@@ -157,9 +156,49 @@
         </div>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button type="submit" mat-button >Book</button>
+          <button type="submit" mat-button matStepperNext>Book</button>
         </div>
       </form>
     </div>
+  </mat-step>
+  <mat-step >
+    <ng-template matStepLabel>Preview</ng-template>
+    <div  class="current-bookings">
+      <h2>Preview</h2>
+      <div *ngIf="currentBooking.length > 0; else noBookings">
+        <div *ngFor="let booking of currentBooking" class="booking-details">
+          <h2>Booking Information</h2>
+          <p><strong>Reservation ID:</strong> {{ booking.bookingInfo.reservationId }}</p>
+          <p><strong>Room No:</strong> {{ booking.bookingInfo.roomNo }}</p>
+          <p><strong>Stay Date From:</strong> {{ booking.bookingInfo.stayDateFrom }}</p>
+          <p><strong>Stay Date To:</strong> {{ booking.bookingInfo.stayDateTo }}</p>
+          <p><strong>Number of Days:</strong> {{ booking.bookingInfo.numberOfDays }}</p>
+          <p><strong>Total Guests:</strong> {{ booking.bookingInfo.totalGuests }}</p>
+          <p><strong>Price per Day per Person:</strong> {{ booking.bookingInfo.pricePerDayPerPerson }}</p>
+          <p><strong>Total Price:</strong> {{ booking.bookingInfo.totalPrice }}</p>
+    
+          <h2>Customer Information</h2>
+          <p><strong>Customer ID:</strong> {{ booking.customerInfo.customerId }}</p>
+          <p><strong>Name:</strong> {{ booking.customerInfo.name }}</p>
+          <p><strong>Email:</strong> {{ booking.customerInfo.email }}</p>
+          <p><strong>Mobile Number:</strong> {{ booking.customerInfo.mobileNumber }}</p>
+          <p><strong>Age:</strong> {{ booking.customerInfo.age }}</p>
+          <p><strong>Birth Date:</strong> {{ booking.customerInfo.birthDate }}</p>
+          <p><strong>Address:</strong> {{ booking.customerInfo.initialAddress }}, {{ booking.customerInfo.city }}, {{ booking.customerInfo.state }}, {{ booking.customerInfo.country }}, {{ booking.customerInfo.pincode }}</p>
+    
+          <h2>Payment Information</h2>
+          <p><strong>Payment ID:</strong> {{ booking.paymentInfo.paymentId }}</p>
+          <p><strong>Payment Mode:</strong> {{ booking.paymentInfo.paymentMode }}</p>
+          <p><strong>Paid Amount:</strong> {{ booking.paymentInfo.paidAmount }}</p>
+          <p><strong>Due Amount:</strong> {{ booking.paymentInfo.dueAmount }}</p>
+    
+          <hr/>
+        </div>
+      </div>
+      <ng-template #noBookings>
+        <p>No bookings available.</p>
+      </ng-template>
+    </div>
+    
   </mat-step>
 </mat-stepper>

@@ -15,6 +15,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButtonModule} from '@angular/material/button';
+import { MatRadioButton } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -32,7 +35,10 @@ import {MatButtonModule} from '@angular/material/button';
     MatStepperModule,
     MatInputModule,
     MatFormFieldModule,
-    MatButtonModule
+    MatButtonModule,
+    MatRadioButton,
+    MatSelectModule,
+    MatOptionModule
   ],
   providers: [provideHttpClient(), provideAnimationsAsync()],
   bootstrap: [AppComponent]
