@@ -1,0 +1,27 @@
+.logo{
+    // max-height: 50px;
+    // margin-right: 20px;
+}
+/* Navbar Styles */
+.navbar {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    z-index: 10;
+  }
+  
+  .logo {
+    width: 150px; /* Adjust according to your logo size */
+  }
+  .navbar-nav {
+    margin-right: auto; /* Push the profile logo to the right */
+  }
+  
+  .d-flex {
+    margin-left: auto; /* Push the profile logo to the extreme right */
+  }
+  .nav-link:hover{
+    color: rgb(78, 76, 170);
+  }

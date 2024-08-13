@@ -1,0 +1,165 @@
+<!-- <button mat-raised-button (click)="isLinear = !isLinear" id="toggle-linear">
+  {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
+</button> -->
+<mat-stepper [linear]="isLinear" #stepper>
+  <mat-step [stepControl]="firstFormGroup">
+      <ng-template matStepLabel>Booking Information</ng-template>
+      <div id="bookingInfo" >
+      <form [formGroup]="bookingForm" (ngSubmit)="onNext('customerInfo')">
+        <div class="form-group">
+          <label for="reservationId">Reservation Id</label>
+          <input type="text" id="reservationId" formControlName="reservationId" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label for="roomNo">Room No.</label>
+          <input type="text" id="roomNo" formControlName="roomNo" class="form-control" readonly>
+        </div>
+        <div class="row">
+          <div class="col-6 form-group">
+            <label for="stayDateFrom">Stay Date From</label>
+            <input type="date" id="stayDateFrom" formControlName="stayDateFrom" class="form-control">
+          </div>
+          <div class="col-6 form-group">
+            <label for="stayDateTo">Stay Date To</label>
+            <input type="date" id="stayDateTo" formControlName="stayDateTo" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="numberOfDays">Number of Days</label>
+          <input type="number" id="numberOfDays" formControlName="numberOfDays" class="form-control" (input)="updateTotalPrice()">
+        </div>
+        <div class="form-group">
+          <label for="totalGuests">Total Number of Guests</label>
+          <input type="number" id="totalGuests" formControlName="totalGuests" class="form-control" (input)="updateTotalPrice()">
+        </div>
+        <div class="form-group">
+          <label for="pricePerDayPerPerson">Price per Day per Person</label>
+          <input type="text" id="pricePerDayPerPerson" formControlName="pricePerDayPerPerson" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label for="totalPrice">Total Price</label>
+          <input type="text" id="totalPrice" formControlName="totalPrice" class="form-control" readonly>
+        </div>
+        <div>
+          <button type="submit" mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </div>
+
+    <mat-step [stepControl]="userTypeFormGroup">
+      <ng-template matStepLabel>User Type</ng-template>
+      <div id="userType">
+        <form [formGroup]="userTypeFormGroup" (ngSubmit)="onUserTypeSubmit()">
+          <div class="form-group">
+            <label for="userType">Are you a new or existing user?</label>
+            <select id="userType" formControlName="userType" class="form-control">
+              <option value="new">New User</option>
+              <option value="existing">Existing User</option>
+            </select>
+          </div>
+          
+          <div *ngIf="isExistingUser">
+            <label for="existingEmail">Select your email</label>
+            <select id="existingEmail" formControlName="existingEmail" class="form-control" (change)="onEmailChange()">
+              <option *ngFor="let email of existingEmails" [value]="email">{{ email }}</option>
+            </select>
+          </div>
+          
+          <div>
+            <button type="submit" mat-button matStepperNext>Next</button>
+          </div>
+        </form>
+      </div>
+    </mat-step>
+    
+      
+  </mat-step>
+  <mat-step [stepControl]="secondFormGroup" label="Customer Information">
+    <div id="customerInfo">
+    <form [formGroup]="customerForm" (ngSubmit)="onNext('paymentInfo')">
+      <div class="form-group">
+        <label for="customerId">Customer Id</label>
+        <input type="text" id="customerId" formControlName="customerId" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" formControlName="name" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" id="email" formControlName="email" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="mobileNumber">Mobile Number</label>
+        <input type="text" id="mobileNumber" formControlName="mobileNumber" class="form-control">
+      </div>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" formControlName="age" class="form-control">
+        </div>
+        <div class="col-6 form-group">
+          <label for="birthDate">Birth Date</label>
+          <input type="date" id="birthDate" formControlName="birthDate" class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="initialAddress">Initial Address</label>
+        <input type="text" id="initialAddress" formControlName="initialAddress" class="form-control">
+      </div>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" formControlName="city" class="form-control">
+        </div>
+        <div class="col-6 form-group">
+          <label for="state">State</label>
+          <input type="text" id="state" formControlName="state" class="form-control">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" formControlName="country" class="form-control">
+        </div>
+        <div class="col-6 form-group">
+          <label for="pincode">Pincode</label>
+          <input type="text" id="pincode" formControlName="pincode" class="form-control">
+        </div>
+      </div>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button type="submit" mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Payment Information</ng-template>
+    <div id="paymentInfo">
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="paymentId">Payment Id</label>
+          <input type="text" id="paymentId" formControlName="paymentId" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label for="paymentMode">Payment Mode</label>
+          <input type="text" id="paymentMode" formControlName="paymentMode" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="paidAmount">Paid Amount</label>
+          <input type="text" id="paidAmount" formControlName="paidAmount" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="dueAmount">Due Amount</label>
+          <input type="text" id="dueAmount" formControlName="dueAmount" class="form-control">
+        </div>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button type="submit" mat-button >Book</button>
+        </div>
+      </form>
+    </div>
+  </mat-step>
+</mat-stepper>

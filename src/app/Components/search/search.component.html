@@ -1,0 +1,91 @@
+<div class="con">
+    <div class="container search overflow-visible">
+        <form [formGroup]="filterForm" (ngSubmit)="onSubmit()" >
+            <div class="row">
+                <!-- <div class="col">
+                <label>Search:</label>
+                <div>
+                    <input name="name" class="form-control" type="text" id="job-keyword" placeholder="Search" />
+                </div>
+            </div> -->
+            <div class="col form-group">
+                <label for="locationName">Location</label>
+                <select id="locationName" class="form-control" formControlName="locationName">
+                  <option value="">All Locations</option>
+                  <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
+                </select>
+            </div>
+
+            <!-- <div class="col">
+                <label>Select Start Date:</label>
+                <div>
+                    <input type="date" class="form-control" id="datepicker" placeholder="Pick a date">
+                </div>
+            </div> -->
+            <div class="col form-group">
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate" class="form-control" formControlName="startDate">
+            </div>
+
+            <!-- <div class="col">
+                <label>Select End Date:</label>
+                <div>
+                    <input type="date" class="form-control" id="datepicker" placeholder="Pick a date">
+                </div>
+            </div> -->
+            <div class="col form-group">
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate" class="form-control" formControlName="endDate">
+            </div>
+
+            <!-- <div class="col">
+                <label>No. of Person: </label>
+                <div>
+                    <select class="form-control">
+                        <option disabled="">No. of person</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                      </select>
+                </div>
+            </div> -->
+            <div class="col form-group">
+                <label for="numberOfPersons">Number of Persons</label>
+                <input type="number" id="numberOfPersons" class="form-control" formControlName="numberOfPersons">
+            </div>
+                
+            </div>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="priceRange">Price Range</label>
+                    <input type="range" id="priceRange" class="form-control" formControlName="priceRange" min="0" max="4000">
+                    <span>{{ filterForm.get('priceRange')?.value }}</span>
+                </div>
+    
+                <div class="col form-group">
+                    <label for="minDays">Minimum Days</label>
+                    <input type="number" id="minDays" class="form-control" formControlName="minDays">
+                </div>
+    
+                <div class="col form-group">
+                    <label for="maxDays">Maximum Days</label>
+                    <input type="number" id="maxDays" class="form-control" formControlName="maxDays">
+                </div>
+    
+                <!-- <div class="col">
+                    <br>
+                    <div>
+                        <button type="button" class="btn btn-primary">Submit</button>
+                    </div>
+                </div> -->
+                <button type="submit" class="btn btn-primary">Filter</button>
+
+            </div>
+            
+
+            
+        </form>
+    </div>
+</div>

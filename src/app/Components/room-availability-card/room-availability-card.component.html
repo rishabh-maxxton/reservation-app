@@ -1,0 +1,71 @@
+<div class="container">
+    <div class="row">
+      <div *ngFor="let room of filteredRooms" class="col-md-4">
+        <div class="card room-card mb-4">
+          <img [src]="getRandomImage()" class="card-img-top" alt="Room Image">
+          <div class="card-body">
+            <h5 class="card-title">{{ room.roomName }}</h5>
+            <!-- <p class="card-text"><i class="bi bi-geo-alt"></i> {{ room.locationName }}</p>
+            <p class="card-text">Price: {{ room.pricePerDayPerPerson }} per day per person</p> -->
+            <div class="d-flex justify-content-between">
+              <div>
+                <i class="bi bi-geo-alt"></i> {{ room.locationName }}
+              </div>
+              <div>
+                <span class="fw-bold">${{ room.pricePerDayPerPerson }}/day</span>
+              </div>
+            </div>
+            <br>
+            <p class="card-text">Guest Capacity: {{ room.guestCapacity }}</p>
+            <p class="card-text">Stay Dates: {{ room.stayDateFrom }} to {{ room.stayDateTo }}</p>
+            <p class="card-text">Arrival Days: {{ room.arrivalDays?.join(", ") }}</p>
+            <p class="card-text">Departure Days: {{ room.departureDays?.join(", ") }}</p>
+            <p class="card-text">Min Stay: {{ room.minStay }} days</p>
+            <p class="card-text">Max Stay: {{ room.maxStay }} days</p>
+            <button routerLink="/form" [state]="{ room: room }" class="btn btn-primary book-now-btn">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <div class="row container">
+    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let room of filteredRooms">
+      <div class="card h-100 shadow-sm">
+        <div class="position-relative h-100">
+          <div class="d-flex h-100">
+              <img class="card-img-top" [src]="getRandomImage()" alt="Room Image">
+          </div>
+          <span class="badge badge-danger position-absolute top-0 start-0 m-2 text-shadow">0% OFF</span>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ room.roomName }}</h5>
+          <div class="d-flex justify-content-between">
+            <div>
+              <i class="bi bi-geo-alt"></i> {{ room.locationName }}
+            </div>
+            <div>
+              <span class="fw-bold">${{ room.pricePerDayPerPerson }}/day</span>
+            </div>
+          </div>
+          <div>
+            <p class="card-text">Guest Capacity: {{ room.guestCapacity }}</p>
+            <p class="card-text">Stay Dates: {{ room.stayDateFrom }} to {{ room.stayDateTo }}</p>
+            <p class="card-text">Arrival Days: {{ room.arrivalDays?.join(", ") }}</p>
+            <p class="card-text">Departure Days: {{ room.departureDays?.join(", ") }}</p>
+            <p class="card-text">Min Stay: {{ room.minStay }} days</p>
+            <p class="card-text">Max Stay: {{ room.maxStay }} days</p>
+            <button routerLink="/form" [state]="{ room: room }" class="btn btn-primary book-now-btn">Book Now</button>
+          </div>
+          <div class="d-flex align-items-center mt-2">
+            <span class="me-1">{{ 4.6 }}</span>
+            <i class="bi bi-star-fill text-warning me-1"></i>
+            <span>({{ 587 }})</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div> -->
+  

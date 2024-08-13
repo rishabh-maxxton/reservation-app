@@ -1,0 +1,12 @@
+.my-container-fluid{
+    padding: 0px;
+}
+.bg-img{
+    height: 70vh;
+    width: 100%;
+    object-fit: cover;
+    filter: brightness(0.9);
+    position: relative;
+    top: -62px;
+    z-index: 0;
+}

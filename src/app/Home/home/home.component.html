@@ -1,0 +1,11 @@
+<section class="container-fluid my-container-fluid">
+    <div >
+        <img src="asset/images/Home.jpg" class="bg-img" alt="..." />
+    </div>
+    <app-search [locations] = "locations" (Data)="submit($event)"></app-search>
+    <app-room-availability-card [filteredRooms] = "filteredRooms" ></app-room-availability-card>
+</section>
+
+
+<!-- <h1>{{Data.controls['locationName'].value}}</h1> -->
+

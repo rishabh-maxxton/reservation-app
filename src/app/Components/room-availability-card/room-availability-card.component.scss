@@ -1,0 +1,74 @@
+.container {
+    margin-top: 20px;
+  
+    .room-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      overflow: hidden;
+      background-color: rgb(241, 241, 241);
+  
+      .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+  
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  
+        .card-img-top {
+          transform: scale(1.1);
+        }
+      }
+  
+      .card-body {
+        h5 {
+          font-size: 1.25rem;
+          font-weight: bold;
+        }
+  
+        p {
+          margin-bottom: 0.5rem;
+        }
+  
+        .book-now-btn {
+          margin-top: 10px;
+          background-color: #007bff;
+          border: none;
+  
+          &:hover {
+            background-color: #0056b3;
+          }
+        }
+      }
+    }
+  }
+
+
+// .card {
+//   transition: transform 0.3s, box-shadow 0.3s;
+// }
+
+// .card-img-top{
+//   width: 100%;
+//   height: 100%;
+// }
+
+// .card:hover {
+//   transform: translateY(-10px);
+//   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+// }
+
+// .position-relative {
+//   position: relative;
+// }
+
+// .badge {
+//   font-size: 0.8rem;
+//   color: rgb(211, 17, 17);
+//   text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff,
+//                1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+// }
+
+  
