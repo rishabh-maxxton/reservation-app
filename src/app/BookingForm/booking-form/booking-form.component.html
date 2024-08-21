@@ -4,75 +4,94 @@
       <div id="bookingInfo" >
       <form [formGroup]="bookingForm" (ngSubmit)="onNext('customerInfo')">
         <div class="form-group">
-          <label for="reservationId">Reservation Id</label>
+          <label class="required" for="reservationId">Reservation Id</label>
           <input type="text" id="reservationId" formControlName="reservationId" class="form-control" readonly>
         </div>
         <div class="form-group">
-          <label for="roomNo">Room No.</label>
+          <label class="required" for="roomNo">Room No.</label>
           <input type="text" id="roomNo" formControlName="roomNo" class="form-control" readonly>
         </div>
         <div class="row">
           <div class="col-6 form-group">
-            <label for="stayDateFrom">Stay Date From</label>
-            <input type="date" id="stayDateFrom" formControlName="stayDateFrom" class="form-control">
+            <label class="required" for="stayDateFrom">Stay Date From</label>
+            <input type="date" id="stayDateFrom" formControlName="stayDateFrom" class="form-control" (input)="UpdateNoOfDays()" [class.is-invalid]="bookingForm.get('stayDateFrom')?.invalid && bookingForm.get('stayDateFrom')?.touched">
+            <div *ngIf="bookingForm.get('stayDateFrom')?.invalid && bookingForm.get('stayDateFrom')?.touched" class="invalid-feedback">
+              Please select a valid start date.
+            </div>
           </div>
-          <div class="col-6 form-group">
-            <label for="stayDateTo">Stay Date To</label>
-            <input type="date" id="stayDateTo" formControlName="stayDateTo" class="form-control">
+          <div  class="col-6 form-group">
+            <label class="required" for="stayDateTo">Stay Date To</label>
+            <input type="date" id="stayDateTo" formControlName="stayDateTo" class="form-control" (input)="UpdateNoOfDays()" [class.is-invalid]="bookingForm.get('stayDateTo')?.invalid && bookingForm.get('stayDateTo')?.touched">
+            <div *ngIf="bookingForm.get('stayDateTo')?.invalid && bookingForm.get('stayDateTo')?.touched" class="invalid-feedback">
+              Please select a valid end date.
+            </div>
           </div>
         </div>
         <div class="form-group">
-          <label for="numberOfDays">Number of Days</label>
-          <input type="number" id="numberOfDays" formControlName="numberOfDays" class="form-control" (input)="updateTotalPrice()">
+          <label class="required" for="numberOfDays">Number of Days</label>
+          <input type="number" id="numberOfDays" formControlName="numberOfDays" class="form-control" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('numberOfDays')?.invalid && bookingForm.get('numberOfDays')?.touched">
+          <div *ngIf="bookingForm.get('numberOfDays')?.invalid && bookingForm.get('numberOfDays')?.touched" class="invalid-feedback">
+            <div *ngIf="bookingForm.get('numberOfDays')?.errors?.['invalidStay']">Minimum Stay should be {{mini}} and Maximum Stay should be {{maxi}}</div>
+          </div>
         </div>
         <div class="form-group">
-          <label for="totalGuests">Total Number of Guests</label>
-          <input type="number" id="totalGuests" formControlName="totalGuests" class="form-control" (input)="updateTotalPrice()">
+          <label class="required" for="totalGuests">Total Number of Guests</label>
+          <input type="number" id="totalGuests" formControlName="totalGuests" class="form-control" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('totalGuests')?.invalid && bookingForm.get('totalGuests')?.touched">
+          <div *ngIf="bookingForm.get('totalGuests')?.invalid && bookingForm.get('totalGuests')?.touched" class="invalid-feedback">
+            <div *ngIf="bookingForm.get('totalGuests')?.errors?.['invalidCapacity']">Maximum Guest Capacity is {{roomCapacity}}</div>
+            <!-- Please enter a valid number of guests (minimum 1). -->
+          </div>
         </div>
         <div class="form-group">
-          <label for="pricePerDayPerPerson">Price per Day per Person</label>
+          <label class="required" for="pricePerDayPerPerson">Price per Day per Person</label>
           <input type="text" id="pricePerDayPerPerson" formControlName="pricePerDayPerPerson" class="form-control" readonly>
         </div>
         <div class="form-group">
-          <label for="totalPrice">Total Price</label>
+          <label class="required" for="totalPrice">Total Price</label>
           <input type="text" id="totalPrice" formControlName="totalPrice" class="form-control" readonly>
         </div>
         <div>
-          <button type="submit" mat-button matStepperNext>Next</button>
+          <button type="submit" mat-button matStepperNext [disabled]="bookingForm.invalid">Next</button>
         </div>
       </form>
     </div>
+  </mat-step>
 
     <mat-step [stepControl]="userTypeFormGroup">
       <ng-template matStepLabel>User Type</ng-template>
       <div id="userType">
         <form [formGroup]="userTypeFormGroup">
-          <mat-form-field>
-            <mat-label>User Type</mat-label>
-            <mat-select formControlName="userType" (selectionChange)="onUserTypeSubmit()">
-              <mat-option value="new">New User</mat-option>
-              <mat-option value="existing">Existing User</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div>
+            <mat-label class="required">User Type</mat-label>
+              <mat-radio-group formControlName="userType" (change)="onUserTypeSubmit()" [class.is-invalid]="userTypeFormGroup.get('userType')?.invalid && userTypeFormGroup.get('userType')?.touched">
+                <mat-radio-button value="new">New User</mat-radio-button>
+                <mat-radio-button value="existing">Existing User</mat-radio-button>
+              </mat-radio-group>
+              <mat-error *ngIf="userTypeFormGroup.get('userType')?.invalid && userTypeFormGroup.get('userType')?.touched">
+                Please select a user type.
+              </mat-error>
+          </div> 
           <div *ngIf="isExistingUser">
             <mat-form-field>
-              <mat-label>Select Email</mat-label>
-              <mat-select formControlName="existingEmail" (selectionChange)="onEmailChange()">
+              <mat-label class="required">Select Email</mat-label>
+              <mat-select formControlName="existingEmail" (selectionChange)="onEmailChange()" [class.is-invalid]="userTypeFormGroup.get('existingEmail')?.invalid && userTypeFormGroup.get('existingEmail')?.touched">
                 <mat-option *ngFor="let email of existingEmails" [value]="email">
                   {{ email }}
                 </mat-option>
               </mat-select>
+              <mat-error *ngIf="userTypeFormGroup.get('existingEmail')?.invalid && userTypeFormGroup.get('existingEmail')?.touched">
+                Please select an email.
+              </mat-error>
             </mat-form-field>
           </div>
           <div>
             <button mat-button matStepperPrevious>Back</button>
-            <button type="submit" mat-button matStepperNext>Next</button>
-
+            <button type="submit" mat-button matStepperNext [disabled]="userTypeFormGroup.invalid">Next</button>
           </div>
         </form>
       </div>
     </mat-step>
-  </mat-step>
+  
   <mat-step [stepControl]="secondFormGroup" label="Customer Information">
     <div id="customerInfo">
     <form [formGroup]="customerForm" (ngSubmit)="onNext('paymentInfo')">
@@ -80,19 +99,44 @@
         <label for="customerId">Customer Id</label>
         <input type="text" id="customerId" formControlName="customerId" class="form-control" readonly>
       </div>
-      <div class="form-group">
+
+      <!-- <div class="form-group">
         <label for="name">Name</label>
         <input type="text" id="name" formControlName="name" class="form-control">
-      </div>
+      </div> -->
       <div class="form-group">
+        <label class="required" for="name">Name</label>
+        <input type="text" id="name" formControlName="name" class="form-control" [class.is-invalid]="customerForm.get('name')?.invalid && customerForm.get('name')?.touched">
+        <div *ngIf="customerForm.get('name')?.invalid && customerForm.get('name')?.touched" class="invalid-feedback">
+          Please enter a valid name.
+        </div>
+      </div>
+
+      <!-- <div class="form-group">
         <label for="email">Email</label>
         <input type="text" id="email" formControlName="email" class="form-control">
-      </div>
+      </div> -->
       <div class="form-group">
+        <label class="required" for="email">Email</label>
+        <input type="text" id="email" formControlName="email" class="form-control" [class.is-invalid]="customerForm.get('email')?.invalid && customerForm.get('email')?.touched">
+        <div *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched" class="invalid-feedback">
+          Please enter a valid email.
+        </div>
+      </div>
+
+      <!-- <div class="form-group">
         <label for="mobileNumber">Mobile Number</label>
         <input type="text" id="mobileNumber" formControlName="mobileNumber" class="form-control">
+      </div> -->
+      <div class="form-group">
+        <label class="required" for="mobileNumber">Mobile Number</label>
+        <input type="number" id="mobileNumber" formControlName="mobileNumber" class="form-control" [class.is-invalid]="customerForm.get('mobileNumber')?.invalid && customerForm.get('mobileNumber')?.touched">
+        <div *ngIf="customerForm.get('mobileNumber')?.invalid && customerForm.get('mobileNumber')?.touched" class="invalid-feedback">
+          Please enter a valid mobile number (10 digits).
+        </div>
       </div>
-      <div class="row">
+
+      <!-- <div class="row">
         <div class="col-6 form-group">
           <label for="age">Age</label>
           <input type="number" id="age" formControlName="age" class="form-control">
@@ -101,12 +145,29 @@
           <label for="birthDate">Birth Date</label>
           <input type="date" id="birthDate" formControlName="birthDate" class="form-control">
         </div>
+      </div> -->
+      <div class="row">
+        <div class="col-6 form-group">
+          <label class="required" for="age">Age</label>
+          <input type="number" id="age" formControlName="age" class="form-control" [class.is-invalid]="customerForm.get('age')?.invalid && customerForm.get('age')?.touched">
+          <div *ngIf="customerForm.get('age')?.invalid && customerForm.get('age')?.touched" class="invalid-feedback">
+            Please enter a valid age (minimum 1).
+          </div>
+        </div>
+        <div class="col-6 form-group">
+          <label class="required" for="birthDate">Birth Date</label>
+          <input type="date" id="birthDate" formControlName="birthDate" class="form-control" [class.is-invalid]="customerForm.get('birthDate')?.invalid && customerForm.get('birthDate')?.touched">
+          <div *ngIf="customerForm.get('birthDate')?.invalid && customerForm.get('birthDate')?.touched" class="invalid-feedback">
+            Please select a valid birth date.
+          </div>
+        </div>
       </div>
       
       <div class="form-group">
         <label for="initialAddress">Initial Address</label>
         <input type="text" id="initialAddress" formControlName="initialAddress" class="form-control">
       </div>
+
       <div class="row">
         <div class="col-6 form-group">
           <label for="city">City</label>
@@ -129,7 +190,7 @@
       </div>
       <div>
         <button mat-button matStepperPrevious>Back</button>
-        <button type="submit" mat-button matStepperNext>Next</button>
+        <button type="submit" mat-button matStepperNext [disabled]="customerForm.invalid">Next</button>
       </div>
     </form>
   </div>
@@ -139,12 +200,23 @@
     <div id="paymentInfo">
       <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-          <label for="paymentId">Payment Id</label>
+          <label class="required" for="paymentId">Payment Id</label>
           <input type="text" id="paymentId" formControlName="paymentId" class="form-control" readonly>
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="paymentMode">Payment Mode</label>
           <input type="text" id="paymentMode" formControlName="paymentMode" class="form-control">
+        </div> -->
+        <div class="form-group">
+          <label class="required" for="paymentType">Payment Type</label>
+          <mat-radio-group formControlName="paymentMode" class="form-control">
+            <mat-radio-button value="card">Credit/Debit Card</mat-radio-button>
+            <mat-radio-button value="upi">UPI</mat-radio-button>
+            <mat-radio-button value="netbanking">Net Banking</mat-radio-button>
+          </mat-radio-group>
+          <mat-error *ngIf="paymentForm.get('paymentType')?.invalid && paymentForm.get('paymentType')?.touched">
+            Please select a payment type.
+          </mat-error>
         </div>
         <div class="form-group">
           <label for="paidAmount">Paid Amount</label>
@@ -156,7 +228,7 @@
         </div>
         <div>
           <button mat-button matStepperPrevious>Back</button>
-          <button type="submit" mat-button matStepperNext>Book</button>
+          <button type="submit" mat-button matStepperNext [disabled]="paymentForm.invalid">Book</button>
         </div>
       </form>
     </div>

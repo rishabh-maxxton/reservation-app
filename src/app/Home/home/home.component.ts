@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room } from '../../Interface/room-interface';
 import { FormGroup } from '@angular/forms';
+import moment from 'moment';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +15,6 @@ export class HomeComponent implements OnInit {
   filteredRooms: Room[] = [];
   locations: string[] = [];
   
-
   formData = {
     locationName: "",
     startDate: "",
@@ -24,6 +24,43 @@ export class HomeComponent implements OnInit {
     minDays: 0,
     maxDays: 0
   }
+
+  filterOutBookedRooms(): void {
+    console.log("Heyy");
+    const bookings = this.getBookingsFromLocalStorage();
+    console.log(bookings);
+
+    this.filteredRooms = this.filteredRooms.filter(room => {
+      return !bookings.some(booking => 
+        booking.bookingInfo.roomNo === room.roomId && this.isDateOverlap(booking.bookingInfo.stayDateFrom, booking.bookingInfo.stayDateTo, this.formData.startDate, this.formData.endDate)
+      );
+    });
+    console.log(this.filteredRooms);
+  }
+
+  getBookingsFromLocalStorage(): any[] {
+    const bookings = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('booking_')) {
+        const booking = JSON.parse(localStorage.getItem(key) || '{}');
+        console.log('Booking Start:', new Date(booking.bookingInfo.stayDateFrom));
+        console.log('Booking End:', new Date(booking.bookingInfo.stayDateTo));
+        console.log('Form Start:', new Date(this.formData.startDate));
+        console.log('Form End:', new Date(this.formData.endDate));
+        console.log(booking.bookingInfo.stayDateFrom)
+        bookings.push(booking);
+      }
+    }
+    
+    return bookings;
+  }
+
+  isDateOverlap(start1: string, end1: string, start2: string, end2: string): boolean {
+    return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
+  }
+
+  
 
   submit(data: FormGroup){
     // console.log(data);
@@ -36,6 +73,7 @@ export class HomeComponent implements OnInit {
     this.formData.minDays = data.controls['minDays'].value;
     this.formData.maxDays = data.controls['maxDays'].value;
     // console.log("Yayyy", this.formData);
+
     this.onFilter();
   }
 
@@ -46,9 +84,14 @@ export class HomeComponent implements OnInit {
       const isPriceMatch = !this.formData.priceRange || room.pricePerDayPerPerson <= this.formData.priceRange;
       const isMinDaysMatch = !this.formData.minDays || (room.minStay && room.minStay >= this.formData.minDays); 
       const isMaxDaysMatch = !this.formData.maxDays || (room.maxStay && room.maxStay <= this.formData.maxDays);
+      const isStartDateMatch = !this.formData.startDate || (room.stayDateFrom && new Date(this.formData.startDate) >= new Date(room.stayDateFrom));
+      const isEndDateMatch = !this.formData.endDate || (room.stayDateTo && new Date(this.formData.endDate) <= new Date(room.stayDateTo));
 
-      return isLocationMatch && isPersonsMatch && isPriceMatch && isMinDaysMatch && isMaxDaysMatch;
+      return isLocationMatch && isPersonsMatch && isPriceMatch && isMinDaysMatch && isMaxDaysMatch && isStartDateMatch && isEndDateMatch;
+      
     });
+    console.log(this.filteredRooms);
+    this.filterOutBookedRooms();
   }
   
 
@@ -56,7 +99,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.roomService.getRooms().subscribe((data: Room[]) => {
-      console.log(data)
+      // console.log(data)
       this.rooms = data;
       this.filteredRooms = data;
       this.locations = [...new Set(data.map(room => room.locationName))];

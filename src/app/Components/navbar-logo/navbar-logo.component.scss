@@ -15,6 +15,11 @@
   .logo {
     width: 150px; /* Adjust according to your logo size */
   }
+
+  .logo:hover{
+    cursor: pointer;
+  }
+
   .navbar-nav {
     margin-right: auto; /* Push the profile logo to the right */
   }

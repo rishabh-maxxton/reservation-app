@@ -1,5 +1,7 @@
+import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+  import moment from 'moment';
 
 @Component({
   selector: 'app-booking-form',
@@ -16,6 +18,9 @@ export class BookingFormComponent implements OnInit {
   isExistingUser = false;
   existingEmails: string[] = [];
   currentBooking: any[] = [];
+  mini: any;
+  maxi: any;
+  roomCapacity: any;
 
   _formBuilder: FormBuilder = new FormBuilder;
 
@@ -29,14 +34,20 @@ export class BookingFormComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     
     const roomData = history.state.room;
+    console.log(roomData)
+
+    this.mini = roomData.minStay;
+    this.maxi = roomData.maxStay;
+    this.roomCapacity = roomData.guestCapacity;
 
     this.bookingForm = this.fb.group({
       reservationId: [{ value: this.generateReservationId(), disabled: true }],
       roomNo: [''],
-      stayDateFrom: [''],
-      stayDateTo: [''],
-      numberOfDays: [''],
-      totalGuests: [''],
+      stayDateFrom: ['', [Validators.required, this.dateValidator, this.roomAvailabilityValidator.bind(this)]],
+      stayDateTo: ['', [Validators.required, this.dateValidator,, this.roomAvailabilityValidator.bind(this)]],
+      numberOfDays: ['', [Validators.required, this.minMaxDayValidator.bind(this)]],
+      // numberOfDays: ['', [Validators.required, Validators.min(this.mini), Validators.max(this.maxi)]],
+      totalGuests: ['', [Validators.required, Validators.min(1), this.guestCapacityValidator.bind(this)]],
       pricePerDayPerPerson: [''],
       totalPrice: ['']
     });
@@ -58,11 +69,11 @@ export class BookingFormComponent implements OnInit {
 
     this.customerForm = this._formBuilder.group({
       customerId:  [{ value: this.generateCustomerId(), disabled: true }],
-      name: [''],
-      email: [''],
-      mobileNumber: [''],
-      age: [''],
-      birthDate: [''],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      age: ['',  [Validators.required, Validators.min(1)]],
+      birthDate: ['', Validators.required],
       initialAddress: [''],
       city: [''],
       state: [''],
@@ -72,7 +83,7 @@ export class BookingFormComponent implements OnInit {
 
     this.paymentForm = this.fb.group({
       paymentId: [{ value: this.generatePaymentId(), disabled: true }],
-      paymentMode: [''],
+      paymentMode: ['', Validators.required],
       paidAmount: [''],
       dueAmount: ['']
     });
@@ -91,7 +102,85 @@ export class BookingFormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.bookingForm); // Check if bookingForm is initialized
+    console.log(this.bookingForm.get('roomNo')?.value); // Check roomNo value
+    console.log(this.mini);
+    console.log(this.maxi);
+  }
+
+  guestCapacityValidator(control: AbstractControl): ValidationErrors | null {
+    const inputGuest = control.value;
+    if(inputGuest > this.roomCapacity){
+      return {invalidCapacity : true}
+    }
+    else return null;
+    
+  }
+
+  minMaxDayValidator(control: AbstractControl): ValidationErrors | null {
+    // debugger;
+    const inputStay = control.value;
+    // console.log(inputStay);
+    // console.log(this.mini);
+    // console.log(this.maxi);
+    if((inputStay < this.mini) || (inputStay > this.maxi)){
+      console.log("xyzz")
+      return { invalidStay: true }
+    }
+    else
+      return null;
+  }
+  
+
+  dateValidator(control: AbstractControl): ValidationErrors | null {
+    const inputDate = moment(control.value);
+    // console.log(inputDate)
+    const today = moment().startOf('day');
+    // console.log(today)
+    return inputDate.isBefore(today) ? { invalidDate: true } : null;
+  }
+
+  roomAvailabilityValidator(control: AbstractControl): ValidationErrors | null {
+    const selectedDateStr = control.value;
+    if (!selectedDateStr) {
+      return null;
+    }
+
+    const selectedDate = moment(selectedDateStr, 'YYYY-MM-DD', true);
+    if (!selectedDate.isValid()) {
+      return { invalidDate: true };
+    }
+  
+    // console.log(this.bookingForm.get('roomNo')?.value);
+    const roomNo = this.bookingForm.get('roomNo')?.value;
+    if (!roomNo) {
+      return null;
+    }
+  
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('booking_')) {
+        const bookingData = JSON.parse(localStorage.getItem(key)!);
+        if (!bookingData?.bookingInfo) {
+          continue;
+        }
+        const bookingStart = moment(bookingData.bookingInfo.stayDateFrom);
+        const bookingEnd = moment(bookingData.bookingInfo.stayDateTo);
+        const storedRoomNo = bookingData.bookingInfo.roomNo;
+  
+        if (
+          storedRoomNo === roomNo &&
+          selectedDate.isBetween(bookingStart, bookingEnd, null, '[]')
+        ) {
+          return { roomUnavailable: true };
+        }
+      }
+    }
+  
+    return null;
+  }
+
 
   loadExistingEmails() {
     const customers = [];
@@ -149,6 +238,13 @@ export class BookingFormComponent implements OnInit {
     this.bookingForm.patchValue({ totalPrice });    
   }
 
+  UpdateNoOfDays(){
+    const startDate = new Date(this.bookingForm.get('stayDateFrom')?.value);
+    const endDate = new Date(this.bookingForm.get('stayDateTo')?.value);
+    const numberOfDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+    this.bookingForm.patchValue({numberOfDays});
+  }
+
   generateReservationId(): string {
     return 'RES' + Math.floor(Math.random() * 10000);
   }
@@ -174,6 +270,9 @@ export class BookingFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.bookingForm.invalid || this.customerForm.invalid || this.paymentForm.invalid) {
+      return;
+    }
     const bookings = [];    
     const customers = [];
     const bookingData = {

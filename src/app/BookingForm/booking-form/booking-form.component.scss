@@ -1,3 +1,8 @@
+.required:after {
+  content:" *";
+  color: red;
+}
+
 .mat-stepper-horizontal {
     margin-top: 8px;
   }
@@ -142,4 +147,48 @@
     font-size: 1rem;
     color: #999;
   }
+}
+
+
+// Container for radio group
+.mat-radio-group-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px; // Space between radio buttons
+  margin-bottom: 16px; // Space below the radio group
+}
+
+// Styling for radio buttons
+.mat-radio-button {
+  display: flex;
+  align-items: center;
+  font-size: 16px; // Adjust font size as needed
+  
+
+  .mat-radio-label-content {
+    
+    font-size: 16px; // Adjust font size for the label
+    margin-left: 8px; // Space between radio button and label
+  }
+
+  // Apply styles for the selected state
+  &.mat-radio-button-checked {
+    .mat-radio-outer-circle {
+      border-color: #3f51b5; // Color of the outer circle when selected
+    }
+    .mat-radio-inner-circle {
+      background-color: #3f51b5; // Color of the inner circle when selected
+    }
+  }
+}
+
+// Styling for the mat-label
+mat-label {
+  font-size: 18px; // Adjust font size for the label
+  margin-bottom: 8px; // Space below the label
+  font-weight: bold; // Make the label text bold
+
+  display: flex;
 }
