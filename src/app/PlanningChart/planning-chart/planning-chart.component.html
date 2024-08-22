@@ -1,6 +1,5 @@
 <div class="container-fluid">
     <div class="row">
-        <!-- Location Filter -->
         <div (change)="onLocationFilterChange()" class="room-filter col">
             <label for="roomFilter">Show rooms:</label>
             <select id="roomFilter" [(ngModel)]="selectedRoomFilter">
@@ -9,7 +8,6 @@
             </select>
         </div>
     
-        <!-- Month Filter -->
         <div (change)="onMonthFilterChange()" class="month-filter col">
             <label for="monthFilter">Select Month:</label>
             <select id="monthFilter" [(ngModel)]="selectedMonth">
@@ -19,15 +17,15 @@
             </select>
         </div>
     </div>
-    
-    <div class="month">
-        {{ months[selectedMonth - 1] }}
-    </div>
+
     <table class="table table-bordered">
         <thead>
             <tr class="th">
-                <th class="rooms" scope="col">Rooms</th>                                
-                <th scope="col" *ngFor="let day of days">
+                <th class="rooms" rowspan="2"> Rooms</th>
+                <th  [attr.colspan]="days.length" >{{ months[selectedMonth - 1] }}</th>
+            </tr>
+            <tr>
+                <th *ngFor="let day of days">
                     <tr>{{ day }}</tr>
                 </th>
             </tr>

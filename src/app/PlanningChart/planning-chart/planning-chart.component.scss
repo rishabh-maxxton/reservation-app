@@ -4,8 +4,7 @@
   }
 
   .rooms{
-    width: 200px;
-    height: 50px;
+    width: 13%;
   }
   
   th, td {
@@ -21,7 +20,7 @@
   }
   
   .booked {
-    background-color: #ffc107; // Highlight for booked days
+    background-color: green; // Highlight for booked days
   }
   
   .tb th {
