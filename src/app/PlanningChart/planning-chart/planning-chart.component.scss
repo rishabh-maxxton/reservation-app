@@ -1,103 +1,101 @@
+$table-color: #dee2e6;
+$primary-color: #e9e6e6;
+$secondary-color: #778ca3;
+$highlight-color: #20bf6b;
+$selected-color: #a5b1c2;
+$white-color: #ffffff;
+$black-color: #000000;
+$border-color: #dee2e6;
+
 .table {
     width: 100%;
     table-layout: fixed; // Ensures cells have equal width
-  }
+}
 
-  .rooms{
-    width: 13%;
-  }
-  
-  th, td {
+.room-column {
+    width: 15%; // Reduced size of the room column
+    background-color: $secondary-color;
+    // font-weight: 300;
+    color: white;
+}
+
+.room-info {
+    background-color: $primary-color; // Highlight for room names
+    color: $black-color;
+    height: 3.75rem;
+    font-weight: 450;
+    text-align: left;
+    padding-left: 0.625rem; // 10px converted to rem
+
+}
+
+th, td {
     text-align: center;
-    height: 40px;
+    height: 2.5rem;
     vertical-align: middle;
-    width: 33px; // You can adjust this value as needed
-    padding: 5px;
-    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+    border: 1px solid $table-color;
     white-space: nowrap; // Prevent text from wrapping
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  
-  .booked {
-    background-color: green; // Highlight for booked days
-  }
-  
-  .tb th {
-    background-color: #007bff; // Highlight for room names
+    cursor: pointer;
+}
+
+.weekday, .day {
+    font-size: 0.85rem; // Slightly smaller font size to fit content
+    background-color: $primary-color;
+    font-weight: 450;
+}
+
+.booked {
+    background-color: $highlight-color; // Highlight for booked days
     color: white;
-  }
-  
-  .th {
-    background-color: #f8f9fa; // Light background for the header
-  }
-  
-  .month-filter, .room-filter {
-    margin-bottom: 15px;
-  }
-  
-  .container-fluid {
-    padding: 20px;
-  }
+    border: none; // Remove borders between booked cells
+}
 
-  .month{
+.selected {
+    background-color: $selected-color; // Highlight for selected days
+    color: black;
+}
+
+.heading{
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    margin-left: 214px;
-    width: 83.6%;
-    border: 1px solid #dee2e6;
+    font-weight: 450;
+}
+
+.filter-headings{
+    font-weight: 550;
+    font-size: larger;
+}
+
+.month-year {
+    font-size: 1rem;
     font-weight: bold;
-    padding-bottom: 7px;
-    padding-top: 7px;
-  }
-  
+    background-color: $secondary-color; // Catchy but subtle color
+    color: white;
+}
 
+.button{
+    background-color: $secondary-color;
+    color: $white-color;
+}
 
-// .table {
-//     width: 100%;
-//     table-layout: fixed; /* Ensures cells have equal width */
-//   }
-  
-//   .rooms {
-//     width: 200px;
-//     height: 80px;
-//   }
-  
-//   .month-header {
-//     text-align: center;
-//     background-color: #e9ecef;
-//     font-weight: bold;
-//   }
-  
-//   th, td {
-//     text-align: center;
-//     height: 40px;
-//     vertical-align: middle;
-//     width: 33px; /* Adjust this value as needed */
-//     padding: 5px;
-//     border: 1px solid #dee2e6;
-//     white-space: nowrap; /* Prevent text from wrapping */
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//   }
-  
-//   .booked {
-//     background-color: #ffc107; /* Highlight for booked days */
-//   }
-  
-//   .tb th {
-//     background-color: #007bff; /* Highlight for room names */
-//     color: white;
-//   }
-  
-//   .th {
-//     background-color: #f8f9fa; /* Light background for the header */
-//   }
-  
-//   .month-filter, .room-filter {
-//     margin-bottom: 15px;
-//   }
-  
-//   .container-fluid {
-//     padding: 20px;
-//   }
-  
+.container-fluid {
+    padding: 1.25rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.625rem;
+}

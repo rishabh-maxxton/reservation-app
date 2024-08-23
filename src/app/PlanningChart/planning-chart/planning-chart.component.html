@@ -1,16 +1,18 @@
+<!-- <h1 class="heading">Planning Chart</h1>
+
 <div class="container-fluid">
     <div class="row">
-        <div (change)="onLocationFilterChange()" class="room-filter col">
+        <div (change)="onLocationFilterChange()" class="col-12 col-md-2">
             <label for="roomFilter">Show rooms:</label>
-            <select id="roomFilter" [(ngModel)]="selectedRoomFilter">
+            <select id="roomFilter" [(ngModel)]="selectedRoomFilter" class="form-control">
                 <option value="all">All</option>
                 <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
             </select>
         </div>
     
-        <div (change)="onMonthFilterChange()" class="month-filter col">
+        <div (change)="onMonthFilterChange()" class="col-12 col-md-2">
             <label for="monthFilter">Select Month:</label>
-            <select id="monthFilter" [(ngModel)]="selectedMonth">
+            <select id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
                 <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
                     {{ months[month - 1] }}
                 </option>
@@ -18,23 +20,102 @@
         </div>
     </div>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered mt-3">
         <thead>
-            <tr class="th">
-                <th class="rooms" rowspan="2"> Rooms</th>
-                <th  [attr.colspan]="days.length" >{{ months[selectedMonth - 1] }}</th>
+            <tr class="thead-light">
+                <th class="room-column" rowspan="3">Rooms</th>
+                <th [attr.colspan]="days.length" class="month-year">{{ months[selectedMonth - 1] }} - {{selectedYear}}</th>
             </tr>
             <tr>
-                <th *ngFor="let day of days">
-                    <tr>{{ day }}</tr>
-                </th>
+                <th *ngFor="let day of days" class="weekday">{{ getWeekday(day) }}</th>
+            </tr>
+            <tr>
+                <th *ngFor="let day of days" class="day">{{ day }}</th>
             </tr>
         </thead>
         <tbody>
-            <tr class="tb" *ngFor="let room of filteredRooms">
-                <th scope="row"><i class="fas fa-bed"></i> {{room.roomId}}.{{ room.roomName }}</th>
-                <td *ngFor="let day of days" [ngClass]="{'booked': isDayBooked(room.roomId, day)}"></td>
+            <tr *ngFor="let room of filteredRooms">
+                <th scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</th>
+                <td *ngFor="let day of days"
+                    [ngClass]="{
+                        'booked': isDayBooked(room.roomId, day), 
+                        'selected': selectedRoomId === room.roomId && selectedDates.includes(day)
+                    }"
+                    (click)="onDateSelect(room.roomId, day)">
+                </td>
             </tr>
         </tbody>
     </table>
+
+    <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
+        <button class="btn btn-primary" 
+        (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
+            Book Now
+        </button>
+    </div>
+</div> -->
+
+
+<h1 class="heading">Planning Chart</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div (change)="onLocationFilterChange()" class="col-12 col-md-2">
+            <label class="filter-headings" for="roomFilter">Show rooms:</label>
+            <select id="roomFilter" [(ngModel)]="selectedRoomFilter" class="form-control">
+                <option value="all">All</option>
+                <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
+            </select>
+        </div>
+
+        <div (change)="onMonthFilterChange()" class="col-12 col-md-2">
+            <label class="filter-headings" for="monthFilter">Select Month:</label>
+            <select id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
+                <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
+                    {{ months[month - 1] }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Show Book Now button only when dates are selected -->
+    <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
+        <button class="btn button" 
+        (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
+        <i class="fa-solid fa-plus"></i> Create Reservation
+        </button>
+    </div>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr class="thead-light">
+                <th class="room-column" rowspan="3">Rooms</th>
+                <th [attr.colspan]="days.length" class="month-year">{{ months[selectedMonth - 1] }} - {{selectedYear}}</th>
+            </tr>
+            <tr>
+                <th *ngFor="let day of days" class="weekday">{{ getWeekday(day) }}</th>
+            </tr>
+            <tr>
+                <th *ngFor="let day of days" class="day">{{ day }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let room of filteredRooms">
+                <th scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</th>
+                <ng-container *ngFor="let day of days">
+                    <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
+                        [attr.colspan]="getBookingRangeColspan(room.roomId, day)"
+                        [ngClass]="{
+                            'booked': isDayBooked(room.roomId, day), 
+                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day)
+                        }"
+                        (mousedown)="startSelection(room.roomId, day)"
+                        (mouseover)="continueSelection(room.roomId, day)"
+                        (mouseup)="endSelection(room.roomId, day)">
+                    </td>
+                </ng-container>
+            </tr>
+        </tbody>
+    </table>
+
+    
 </div>

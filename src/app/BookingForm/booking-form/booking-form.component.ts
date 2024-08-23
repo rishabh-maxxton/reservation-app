@@ -32,8 +32,20 @@ export class BookingFormComponent implements OnInit {
   });
 
   constructor(private fb: FormBuilder) {
-    
+
+    // let roomData;
+
+    // if(history.state.room){
+    //   roomData = history.state.room;
+    // }
+    // else{
+    //   roomData = history.state;
+    // }
+
     const roomData = history.state.room;
+    
+    
+
     console.log(roomData)
 
     this.mini = roomData.minStay;
@@ -52,12 +64,17 @@ export class BookingFormComponent implements OnInit {
       totalPrice: ['']
     });
 
+    // this.bookingForm.patchValue({
+    //   numberOfDays: this.UpdateNoOfDays()
+    // });
+
     if (roomData) {
       this.bookingForm.patchValue({
         roomNo: roomData.roomId,
         stayDateFrom: roomData.stayDateFrom,
         stayDateTo: roomData.stayDateTo,
-        pricePerDayPerPerson: roomData.pricePerDayPerPerson
+        pricePerDayPerPerson: roomData.pricePerDayPerPerson,
+        numberOfDays: this.UpdateNoOfDays()
       });
       this.bookingForm.patchValue({ reservationId: this.generateReservationId() });
     }
@@ -107,6 +124,7 @@ export class BookingFormComponent implements OnInit {
     console.log(this.bookingForm.get('roomNo')?.value); // Check roomNo value
     console.log(this.mini);
     console.log(this.maxi);
+    this.UpdateNoOfDays();
   }
 
   guestCapacityValidator(control: AbstractControl): ValidationErrors | null {

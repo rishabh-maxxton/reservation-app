@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room } from '../../Interface/room-interface';
+import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-planning-chart',
@@ -15,10 +17,14 @@ export class PlanningChartComponent implements OnInit {
   locations: string[] = [];
   selectedRoomFilter: string = 'all';
   selectedMonth: number = new Date().getMonth() + 1;
+  selectedYear: number = new Date().getFullYear();
   bookings: any[] = [];
+  selectedRoomId: number | null = null;
+  selectedDates: number[] = [];
+  weekdays: string[] = [];
   months: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  constructor(private roomService: RoomServiceService) {}
+  constructor(private roomService: RoomServiceService, private router: Router, private datePipe: DatePipe) {}
 
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
@@ -29,12 +35,33 @@ export class PlanningChartComponent implements OnInit {
     
     this.loadBookings();
     this.generateDaysForMonth(this.selectedMonth);
+    this.generateDaysInMonth(this.selectedYear, this.selectedMonth);
+  }
+
+  generateDaysInMonth(year: number, month: number) {
+    const date = new Date(year, month - 1, 1);
+    const days = [];
+    const weekdays = [];
+    while (date.getMonth() === month - 1) {
+        days.push(date.getDate());
+        weekdays.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+        date.setDate(date.getDate() + 1);
+    }
+    this.days = days;
+    this.weekdays = weekdays;
+    console.log(weekdays)
   }
 
   generateDaysForMonth(month: number): void {
     const daysInMonth = new Date(new Date().getFullYear(), month, 0).getDate();
     this.days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   }
+
+  formatDate(date: number): string {
+    // Assuming 'date' is a day of the month, and selectedMonth is the current month, create a full date
+    const fullDate = new Date(new Date().getFullYear(), this.selectedMonth - 1, date);
+    return this.datePipe.transform(fullDate, 'yyyy-MM-dd')!;
+}
 
   loadBookings() {
     this.bookings = this.getBookingsFromLocalStorage();
@@ -68,7 +95,6 @@ export class PlanningChartComponent implements OnInit {
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  // Filter bookings by room and month
   getRoomBookingsForMonth(roomId: number, month: number): Array<{ startDate: number, endDate: number }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
@@ -84,13 +110,11 @@ export class PlanningChartComponent implements OnInit {
     })).sort((a, b) => a.startDate - b.startDate);
   }
 
-  // Check if a particular day is within the booking dates
   isDayBooked(roomId: number, day: number): boolean {
     const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
     return bookings.some(booking => day >= booking.startDate && day <= booking.endDate);
   }
 
-  // Update filters on change
   onLocationFilterChange(): void {
     this.applyFilters();
   }
@@ -99,5 +123,109 @@ export class PlanningChartComponent implements OnInit {
     this.generateDaysForMonth(this.selectedMonth);
     this.applyFilters();
   }
+
+  // Initialize selection variables
+isSelecting: boolean = false;
+
+startSelection(roomId: number, day: number) {
+  if (this.isDayBooked(roomId, day)) return;
+  this.isSelecting = true;
+  this.selectedRoomId = roomId;
+  this.selectedDates = [day];
 }
 
+continueSelection(roomId: number, day: number) {
+  if (this.isDayBooked(roomId, day)) return;
+  if (this.isSelecting && roomId === this.selectedRoomId) {
+    const lastDate = this.selectedDates[this.selectedDates.length - 1];
+    if (day > lastDate) {
+      this.selectedDates.push(day);
+    }
+  }
+}
+
+endSelection(roomId: number, day: number) {
+  if (this.isDayBooked(roomId, day)) return;
+  this.isSelecting = false;
+}
+
+isPartOfBookedRange(roomId: string, day: number): boolean {
+  // Find the booking that matches the given roomId and includes the day
+  return this.bookings.some(booking =>
+      booking.roomId === roomId && day >= booking.startDate && day <= booking.endDate
+  );
+} 
+
+getBookingRangeColspan(roomId: string, day: number): number {
+  // Find the booking that matches the given roomId and starts on the given day
+  const booking = this.bookings.find(booking =>
+      booking.roomId === roomId && day === booking.startDate
+  );
+
+  if (booking) {
+      // Calculate the number of days this booking spans and return as colspan
+      return booking.endDate - booking.startDate + 1;
+  }
+
+  // Return 1 if no booking starts on this day (i.e., default colspan)
+  return 1;
+}
+
+
+  // Handling date selection
+  onDateSelect(roomId: number, day: number): void {
+    if (this.isDayBooked(roomId, day)) return; // Prevent selecting booked dates
+
+    // If the same room is selected, continue selection
+    if (this.selectedRoomId === roomId) {
+      const lastSelectedDate = this.selectedDates[this.selectedDates.length - 1];
+      if (day > lastSelectedDate) {
+        this.selectedDates.push(day);
+      } else {
+        this.selectedDates = [day]; // Reset selection if selecting earlier date
+      }
+    } else {
+      // Select a different room, clear previous selections
+      this.selectedRoomId = roomId;
+      this.selectedDates = [day];
+    }
+  }
+
+  getPrice(roomid: any){
+    // const matchingAdditionalInfo = additionalData.filter(data => data.roomId === room.roomId);
+    console.log(this.rooms);
+    const roomObj = this.rooms.filter(data => data.roomId == roomid);
+    console.log(roomObj);
+    return roomObj[0].pricePerDayPerPerson;
+
+  }
+
+  getWeekday(date: number): string {
+    const selectedDate = new Date(this.selectedYear, this.selectedMonth - 1, date); // Assuming you have a selectedYear variable
+    const weekdays = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'];
+    return weekdays[selectedDate.getDay()];
+}
+
+  bookRoom(room: any, stayDateFrom: string, stayDateTo: string) {
+    console.log(room);
+    let price = this.getPrice(room);
+    console.log(stayDateFrom, stayDateTo)
+    this.router.navigate(['/form'], {
+      state: {
+        room: {
+          roomId: room,
+          roomName: room.roomName,
+          stayDateFrom: stayDateFrom,
+          stayDateTo: stayDateTo,
+          pricePerDayPerPerson: price,
+          minStay: room.minStay,
+          maxStay: room.maxStay,
+          guestCapacity: room.numberOfPersons
+        }
+      }
+      
+    });
+    console.log(this.rooms);
+
+  }
+}

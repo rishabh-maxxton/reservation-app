@@ -19,6 +19,7 @@ import { MatRadioButton, MatRadioGroup, MatRadioModule } from '@angular/material
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { PlanningChartComponent } from './PlanningChart/planning-chart/planning-chart.component';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -46,7 +47,7 @@ import { PlanningChartComponent } from './PlanningChart/planning-chart/planning-
     MatRadioGroup,
     FormsModule,
   ],
-  providers: [provideHttpClient(), provideAnimationsAsync()],
+  providers: [provideHttpClient(), provideAnimationsAsync(), DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
