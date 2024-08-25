@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room } from '../../Interface/room-interface';
 import { Router } from '@angular/router';
@@ -10,8 +10,10 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./planning-chart.component.scss']
 })
 
+
 export class PlanningChartComponent implements OnInit {
   rooms: any[] = [];
+  stays: any[] = [];
   filteredRooms: any[] = [];
   days: number[] = [];
   locations: string[] = [];
@@ -24,14 +26,19 @@ export class PlanningChartComponent implements OnInit {
   weekdays: string[] = [];
   isSelecting: boolean = false;
   months: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  unavailableDates: any;
 
-  constructor(private roomService: RoomServiceService, private router: Router, private datePipe: DatePipe) {}
+  constructor(private roomService: RoomServiceService, private router: Router, private datePipe: DatePipe, private renderer: Renderer2) {}
 
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
       this.locations = [...new Set(data.map(room => room.locationName))];
       this.rooms = data;
       this.applyFilters();
+    });
+
+    this.roomService.loadAvailability().subscribe((data: Room[]) => {
+      this.stays = data;
     });
     
     this.loadBookings();
@@ -123,6 +130,7 @@ export class PlanningChartComponent implements OnInit {
   onMonthFilterChange(): void {
     this.generateDaysForMonth(this.selectedMonth);
     this.applyFilters();
+    
   }
 
 

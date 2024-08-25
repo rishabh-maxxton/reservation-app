@@ -12,10 +12,12 @@ export class RoomServiceService {
   private apiUrl1 = 'https://jadhavsudhit.github.io/Booking-module/rooms.json';
   private apiUrl2 = 'https://jadhavsudhit.github.io/Booking-module/stays.json';
 
-  private roomsApiUrl = 'https://jadhavsudhit.github.io/Booking-module/rooms.json';
-
   loadRooms(): Observable<any[]> {
-    return this.http.get<any[]>(this.roomsApiUrl);
+    return this.http.get<any[]>(this.apiUrl1);
+  }
+
+  loadAvailability(): Observable<any[]>{
+    return this.http.get<any[]>(this.apiUrl2);
   }
   
   constructor(private http: HttpClient) { }
