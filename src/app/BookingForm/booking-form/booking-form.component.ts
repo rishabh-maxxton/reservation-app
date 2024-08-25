@@ -32,20 +32,9 @@ export class BookingFormComponent implements OnInit {
   });
 
   constructor(private fb: FormBuilder) {
-
-    // let roomData;
-
-    // if(history.state.room){
-    //   roomData = history.state.room;
-    // }
-    // else{
-    //   roomData = history.state;
-    // }
-
+    
     const roomData = history.state.room;
     
-    
-
     console.log(roomData)
 
     this.mini = roomData.minStay;

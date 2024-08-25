@@ -13,9 +13,8 @@ $border-color: #dee2e6;
 }
 
 .room-column {
-    width: 15%; // Reduced size of the room column
+    width: 15%;
     background-color: $secondary-color;
-    // font-weight: 300;
     color: white;
 }
 
@@ -25,8 +24,7 @@ $border-color: #dee2e6;
     height: 3.75rem;
     font-weight: 450;
     text-align: left;
-    padding-left: 0.625rem; // 10px converted to rem
-
+    padding-left: 0.625rem;
 }
 
 th, td {
@@ -42,19 +40,19 @@ th, td {
 }
 
 .weekday, .day {
-    font-size: 0.85rem; // Slightly smaller font size to fit content
+    font-size: 0.85rem;
     background-color: $primary-color;
     font-weight: 450;
 }
 
 .booked {
-    background-color: $highlight-color; // Highlight for booked days
+    background-color: $highlight-color;
     color: white;
     border: none; // Remove borders between booked cells
 }
 
 .selected {
-    background-color: $selected-color; // Highlight for selected days
+    background-color: $selected-color;
     color: black;
 }
 
@@ -73,13 +71,15 @@ th, td {
 .month-year {
     font-size: 1rem;
     font-weight: bold;
-    background-color: $secondary-color; // Catchy but subtle color
+    background-color: $secondary-color;
     color: white;
 }
 
 .button{
-    background-color: $secondary-color;
+    background-color: #099e4f;
     color: $white-color;
+    float: right;
+    margin-right: 0;
 }
 
 .container-fluid {
