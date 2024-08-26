@@ -47,7 +47,10 @@
                         [attr.colspan]="getBookingRangeColspan(room.roomId, day)"
                         [ngClass]="{
                             'booked': isDayBooked(room.roomId, day), 
-                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day)
+                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
+                            'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
+                            'unavailable': !isDayAvailable(room.roomId, day),
+                            'arrival-day': isArrivalDay(room.roomId, day)
                         }"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"

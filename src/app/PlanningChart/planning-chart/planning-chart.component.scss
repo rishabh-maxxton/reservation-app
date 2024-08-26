@@ -6,11 +6,39 @@ $selected-color: #a5b1c2;
 $white-color: #ffffff;
 $black-color: #000000;
 $border-color: #dee2e6;
+$unavailability: rgb(207, 207, 207);
 
 .table {
     width: 100%;
     table-layout: fixed; // Ensures cells have equal width
 }
+
+// .arrival-day {
+//     background-color: rgb(218, 221, 228);
+//     color: white;
+//   }
+
+.available{
+    cursor: not-allowed;
+  }
+  
+  /* Styles for cells that are arrival days */
+  .arrival-day {
+    cursor: pointer;
+    background-color: rgb(251, 251, 251);
+    color: white;
+  }
+  
+  /* Styles for hover effect on arrival days */
+  .arrival-day:hover {
+    background-color: darkgreen;
+    color: white;
+  }
+  .unavailable {
+    background-color: $unavailability;
+    color: white;
+    cursor: not-allowed;
+  }
 
 
 .room-column {
