@@ -6,7 +6,8 @@ $selected-color: #a5b1c2;
 $white-color: #ffffff;
 $black-color: #000000;
 $border-color: #dee2e6;
-$unavailability: rgb(207, 207, 207);
+$unavailability: #d3d0d0bd;
+$arivalDay: rgba(245, 248, 248, 0.856);
 
 .table {
     width: 100%;
@@ -19,13 +20,14 @@ $unavailability: rgb(207, 207, 207);
 //   }
 
 .available{
-    cursor: not-allowed;
+    cursor: pointer;
+    // cursor: not-allowed;
   }
   
   /* Styles for cells that are arrival days */
   .arrival-day {
     cursor: pointer;
-    background-color: rgb(251, 251, 251);
+    background-color: $arivalDay;
     color: white;
   }
   
