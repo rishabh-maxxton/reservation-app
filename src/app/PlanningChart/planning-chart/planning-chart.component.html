@@ -54,7 +54,9 @@
                         }"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"
-                        (mouseup)="endSelection(room.roomId, day)">
+                        (mouseup)="endSelection(room.roomId, day)"
+                        matTooltip="{{ getTooltipContent(room.roomId, day) }}"
+                        matTooltipPosition="below">
                     </td>
                 </ng-container>
             </tr>

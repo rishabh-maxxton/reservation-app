@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2, ViewChild  } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room } from '../../Interface/room-interface';
 import { Router } from '@angular/router';
@@ -7,7 +7,8 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-planning-chart',
   templateUrl: './planning-chart.component.html',
-  styleUrls: ['./planning-chart.component.scss']
+  styleUrls: ['./planning-chart.component.scss'],
+  
 })
 export class PlanningChartComponent implements OnInit {
   rooms: any[] = [];
@@ -25,6 +26,7 @@ export class PlanningChartComponent implements OnInit {
   isSelecting: boolean = false;
   months: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   availability: any[] = [];
+  roomConstraints: { [roomId: number]: { minStay: number, maxStay: number, arrivalDays: string[], departureDays: string[] } } = {};
   roomConstraints1: {
     [roomId: number]: Array<{
       arrivalDays: string[],
@@ -38,8 +40,16 @@ export class PlanningChartComponent implements OnInit {
     private roomService: RoomServiceService,
     private router: Router,
     private datePipe: DatePipe,
-    private renderer: Renderer2
   ) {}
+
+  getTooltipContent(roomId: number, day: number): string {
+    if (this.isDayBooked(roomId, day)) {
+      console.log(this.selectedMonth);
+      let data = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+      return `Booked by: ${data[0].customerEmail} \n From: ${data[0].startDate}-${this.months[this.selectedMonth-1]}-${this.selectedYear} \n To: ${data[0].endDate}-${this.months[this.selectedMonth-1]}-${this.selectedYear}`;
+    }
+    return '';
+  }
 
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
@@ -58,34 +68,6 @@ export class PlanningChartComponent implements OnInit {
     this.generateDaysForMonth(this.selectedMonth);
     this.generateDaysInMonth(this.selectedYear, this.selectedMonth);
   }
-
-  // getRoomConstraints(roomId: number): Array<{ [key: string]: { minStay: number, maxStay: number } }> {
-  //   const constraints = this.roomConstraints1[roomId];
-
-  //   if (!constraints) {
-  //     return [];
-  //   }
-
-  //   const constraintMap: { [key: string]: { minStay: number, maxStay: number } } = {};
-
-  //   constraints.forEach(constraint => {
-  //     constraint.arrivalDays.forEach(day => {
-  //       if (!constraintMap[day]) {
-  //         constraintMap[day] = {
-  //           minStay: constraint.minStay,
-  //           maxStay: constraint.maxStay
-  //         };
-  //       } else {
-  //         constraintMap[day].minStay = Math.min(constraintMap[day].minStay, constraint.minStay);
-  //         constraintMap[day].maxStay = Math.max(constraintMap[day].maxStay, constraint.maxStay);
-  //       }
-  //     });
-  //   });
-
-  //   return Object.keys(constraintMap).map(day => ({
-  //     [day]: constraintMap[day]
-  //   }));
-  // }
 
   getRoomConstraints(roomId: number): Array<{ [key: string]: { minStay: number, maxStay: number } }> {
     const constraints = this.roomConstraints1[roomId];
@@ -109,6 +91,7 @@ export class PlanningChartComponent implements OnInit {
         }
       });
     });
+    // console.log(constraintMap);
   
     return [constraintMap]; // Ensure this returns an array with a single object
   }
@@ -169,7 +152,7 @@ export class PlanningChartComponent implements OnInit {
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ startDate: number, endDate: number }> {
+  getRoomBookingsForMonth(roomId: number, month: number): Array<{ startDate: number, endDate: number, customerEmail: string }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
@@ -178,15 +161,21 @@ export class PlanningChartComponent implements OnInit {
              bookingEndDate.getMonth() === month - 1;
     });
 
+    // console.log(roomBookings);
+
     return roomBookings.map(booking => ({
       startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
-      endDate: new Date(booking.bookingInfo.stayDateTo).getDate()
+      endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
+      customerEmail: booking.customerInfo.email,
     })).sort((a, b) => a.startDate - b.startDate);
+    
   }
 
   isDayBooked(roomId: number, day: number): boolean {
     const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    // console.log(bookings);
     return bookings.some(booking => day >= booking.startDate && day <= booking.endDate);
+
   }
 
   isDayAvailable(roomId: number, day: number): boolean {
@@ -201,13 +190,26 @@ export class PlanningChartComponent implements OnInit {
     return isValidDate && !this.isDayBooked(roomId, day);
   }
 
+  isMinStayBooked(roomId: number, day: number): boolean {
+    const constraints1 = this.getRoomConstraints(roomId);
+    const minStay1 = constraints1[0][this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, day).getDay())]?.minStay;
+    // console.log(minStay1);
+    // if(minStay1){
+    //   console.log(day+minStay1);
+    // }
+    return true;
+  }
+
   isArrivalDay(roomId: number, day: number): boolean {
     const constraints = this.roomConstraints1[roomId] || [];
     const date = new Date(this.selectedYear, this.selectedMonth - 1, day);
     const dayOfWeekString = this.getDayOfWeekString(date.getDay());
+    
+    
+
     return constraints.some(constraint => 
       constraint.arrivalDays.includes(dayOfWeekString) &&
-      this.isDayAvailable(roomId, day)
+      this.isDayAvailable(roomId, day) && this.isMinStayBooked(roomId, day)
     );
   }
 
@@ -234,20 +236,34 @@ export class PlanningChartComponent implements OnInit {
     this.applyFilters();
   }
 
+  extractRoomConstraints(): void {
+    this.roomConstraints = this.availability.reduce((acc, curr) => {
+      const roomId = curr.roomId;
+      if (!acc[roomId]) {
+        acc[roomId] = {
+          minStay: curr.minStay,
+          maxStay: curr.maxStay,
+          arrivalDays: curr.arrivalDays,
+          departureDays: curr.departureDays
+        };
+      }
+      return acc;
+    }, {} as { [roomId: number]: { minStay: number, maxStay: number, arrivalDays: string[], departureDays: string[] } });
+    console.log(this.roomConstraints);
+  }
+
   extractRoomConstraints1(): void {
     this.roomConstraints1 = this.availability.reduce((acc, curr) => {
       const roomId = curr.roomId;
       if (!acc[roomId]) {
         acc[roomId] = [];
       }
-
       acc[roomId].push({
         arrivalDays: curr.arrivalDays,
         departureDays: curr.departureDays,
         minStay: curr.minStay,
         maxStay: curr.maxStay
       });
-
       return acc;
     }, {} as { [roomId: number]: Array<{ arrivalDays: string[], departureDays: string[], minStay: number, maxStay: number }> });
 
@@ -273,32 +289,26 @@ export class PlanningChartComponent implements OnInit {
       let newDateRange = [...this.selectedDates];
       const constraints = this.getRoomConstraints(roomId);
   
-      console.log('Constraints:', constraints); // Debugging line
+      console.log('Constraints:', constraints); 
       console.log('Day of Week:', this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDates[0]).getDay()));
   
       if (constraints.length > 0) {
         const constraintForDay = constraints[0][this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, day).getDay())];
-        console.log('Constraint For Day:', constraintForDay); // Debugging line
-        // this.selectedDates[0]
+        console.log('Constraint For Day:', constraintForDay);
         const start = constraints[0][this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDates[0]).getDay())];
         console.log(start);
-  
-        // if (constraintForDay) {
-        if (start) {
+
           if (day > lastDate) {
-            // Extend selection to the right
+            // Extends selection to the right
             while (newDateRange.length < start.maxStay && day > lastDate) {
               lastDate++;
               if (day >= lastDate) {
-                if (this.isDepartureDay(roomId, lastDate)) {
+                if (this.isDayAvailable(roomId, lastDate) && !this.isDayBooked(roomId, lastDate)) {
                   newDateRange.push(lastDate);
-                  break; // Stop extending if reaching a departure day
-                } else if (this.isDayAvailable(roomId, lastDate)) {
-                  newDateRange.push(lastDate);
-                } else {
+                }else{
                   break;
                 }
-              } else {
+              }else{
                 break;
               }
             }
@@ -306,26 +316,17 @@ export class PlanningChartComponent implements OnInit {
           } else if (day < lastDate) {
             // Extend selection to the left
             while (newDateRange.length > start.minStay && day < lastDate) {
-            // while (newDateRange.length > constraintForDay.minStay && day < lastDate) {
               lastDate--;
               if (day <= lastDate) {
-                if (this.isDepartureDay(roomId, lastDate + 1)) {
                   newDateRange = newDateRange.filter(d => d !== lastDate + 1);
-                  break; // Stop if reaching a departure day
-                } else {
-                  newDateRange = newDateRange.filter(d => d !== lastDate + 1);
-                }
               } else {
                 break;
               }
             }
             this.selectedDates = newDateRange;
           }
-        } else {
-          console.warn('No constraint found for the day:', day); // Debugging line
-        }
       } else {
-        console.warn('No constraints available for room:', roomId); // Debugging line
+        console.warn('No constraints available for room:', roomId); // Edge case
       }
     }
   }
@@ -334,7 +335,7 @@ export class PlanningChartComponent implements OnInit {
   endSelection(roomId: number, day: number) {
     if (!this.isDayAvailable(roomId, day) || this.isDayBooked(roomId, day)) return;
     this.isSelecting = false;
-    this.applySelectionConstraints(roomId, day);
+    // this.applySelectionConstraints(roomId, day);
   }
 
   applySelectionConstraints(roomId: number, day: number) {
@@ -344,6 +345,7 @@ export class PlanningChartComponent implements OnInit {
       // Ensure at least minStay number of days are selected
       while (this.selectedDates.length < constraints[0][this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, day).getDay())]?.minStay) {
         let lastDate = this.selectedDates[this.selectedDates.length - 1];
+        
         if (lastDate < this.days.length && !this.isDayBooked(roomId, lastDate + 1) && this.isDayAvailable(roomId, lastDate + 1)) {
             this.selectedDates.push(lastDate + 1);
         } else {

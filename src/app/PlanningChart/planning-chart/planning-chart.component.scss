@@ -76,11 +76,14 @@ th, td {
     background-color: $highlight-color;
     color: white;
     border: none; // Remove borders between booked cells
+    cursor: help;
 }
+
 
 .selected {
     background-color: $selected-color;
     color: black;
+    cursor: grabbing;
 }
 
 .heading{
