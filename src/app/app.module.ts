@@ -20,7 +20,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { PlanningChartComponent } from './PlanningChart/planning-chart/planning-chart.component';
 import { DatePipe } from '@angular/common';
-import { BookingOverlayComponent } from './Components/booking-overlay/booking-overlay/booking-overlay.component';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkConnectedOverlay } from '@angular/cdk/overlay';
@@ -35,7 +34,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     NavbarLogoComponent,
     BookingFormComponent,
     PlanningChartComponent,
-    BookingOverlayComponent,
   ],
   imports: [
     BrowserModule,

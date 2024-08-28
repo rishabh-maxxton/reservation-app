@@ -1,6 +1,6 @@
 import { Component, OnInit, Renderer2, ViewChild  } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
-import { Room } from '../../Interface/room-interface';
+import { Room, StayDetails, RoomConstraint } from '../../Interface/room-interface';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
@@ -11,9 +11,8 @@ import { DatePipe } from '@angular/common';
   
 })
 export class PlanningChartComponent implements OnInit {
-  rooms: any[] = [];
-  stays: any[] = [];
-  filteredRooms: any[] = [];
+  rooms:  Room[] = [];
+  filteredRooms: Room[] = [];
   days: number[] = [];
   locations: string[] = [];
   selectedRoomFilter: string = 'all';
@@ -25,16 +24,19 @@ export class PlanningChartComponent implements OnInit {
   weekdays: string[] = [];
   isSelecting: boolean = false;
   months: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  availability: any[] = [];
+  availability: StayDetails[] = [];
   roomConstraints: { [roomId: number]: { minStay: number, maxStay: number, arrivalDays: string[], departureDays: string[] } } = {};
   roomConstraints1: {
-    [roomId: number]: Array<{
-      arrivalDays: string[],
-      departureDays: string[],
-      minStay: number,
-      maxStay: number
-    }>
+    [roomId: number]: Array<RoomConstraint>
   } = {};
+  // roomConstraints1: {
+  //   [roomId: number]: Array<{
+  //     arrivalDays: string[],
+  //     departureDays: string[],
+  //     minStay: number,
+  //     maxStay: number
+  //   }>
+  // } = {};
 
   constructor(
     private roomService: RoomServiceService,
@@ -44,7 +46,6 @@ export class PlanningChartComponent implements OnInit {
 
   getTooltipContent(roomId: number, day: number): string {
     if (this.isDayBooked(roomId, day)) {
-      console.log(this.selectedMonth);
       let data = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
       return `Booked by: ${data[0].customerEmail} \n From: ${data[0].startDate}-${this.months[this.selectedMonth-1]}-${this.selectedYear} \n To: ${data[0].endDate}-${this.months[this.selectedMonth-1]}-${this.selectedYear}`;
     }
@@ -265,7 +266,7 @@ export class PlanningChartComponent implements OnInit {
         maxStay: curr.maxStay
       });
       return acc;
-    }, {} as { [roomId: number]: Array<{ arrivalDays: string[], departureDays: string[], minStay: number, maxStay: number }> });
+    }, {} as { [roomId: number]: Array<RoomConstraint> });
 
     console.log(this.roomConstraints1);
   }
@@ -359,13 +360,13 @@ export class PlanningChartComponent implements OnInit {
     console.log(this.roomConstraints1)
   }
 
-  isPartOfBookedRange(roomId: string, day: number): boolean {
+  isPartOfBookedRange(roomId: number, day: number): boolean {
     return this.bookings.some(booking =>
       booking.roomId === roomId && day >= booking.startDate && day <= booking.endDate
     );
   }
 
-  getBookingRangeColspan(roomId: string, day: number): number {
+  getBookingRangeColspan(roomId: number, day: number): number {
     const booking = this.bookings.find(booking =>
       booking.roomId === roomId && day === booking.startDate
     );

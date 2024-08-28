@@ -10,7 +10,8 @@ import { Room } from '../Interface/room-interface';
 export class RoomServiceService {
 
   private apiUrl1 = 'https://jadhavsudhit.github.io/Booking-module/rooms.json';
-  private apiUrl2 = 'https://jadhavsudhit.github.io/Booking-module/stays.json';
+  private apiUrl2 = "https://jadhavsudhit.github.io/Booking-module/stays.json";
+  private dummyStayJson = 'https://dummyjson.com/c/960c-46d6-4dfa-96a8';
 
   loadRooms(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl1);
