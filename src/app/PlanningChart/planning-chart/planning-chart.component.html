@@ -18,13 +18,29 @@
             </select>
         </div>
     </div>
+    <div>
+        <div class="color-legend mt-4">
+            <h4 class="legend-title">Color Legend</h4>
+            <ul class="legend-list">
+                <li><span class="color-box booked"></span> Booked</li>
+                <li><span class="color-box selected"></span> Selected</li>
+                <li><span class="color-box available"></span> Available</li>
+                <li><span class="color-box unavailable"></span> Unavailable</li>
+                <li><span class="color-box arrival-day"></span> Arrival Day</li>
+                <li><span class="color-box arrival-day-on-hover"></span> Arrival on Hover</li>
+            </ul>
+        </div>
+        <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
+            <button  class="btn button float-right" 
+            (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
+            <i class="fa-solid fa-plus"></i> Create Reservation
+            </button>
+        </div>
 
-    <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
-        <button  class="btn button float-right" 
-        (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
-        <i class="fa-solid fa-plus"></i> Create Reservation
-        </button>
     </div>
+
+    
+    
 
     <table class="table table-bordered mt-3">
         <thead>

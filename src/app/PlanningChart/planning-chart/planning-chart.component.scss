@@ -1,22 +1,77 @@
 $table-color: #dee2e6;
 $primary-color: #e9e6e6;
 $secondary-color: #778ca3;
-$highlight-color: #20bf6b;
+$booked: #20bf6b;
 $selected-color: #a5b1c2;
 $white-color: #ffffff;
 $black-color: #000000;
 $border-color: #dee2e6;
 $unavailability: #d3d0d0bd;
 $arivalDay: rgba(245, 248, 248, 0.856);
+$arivalDayHover: darkgreen;
+$createResButton: #099e4f;
 
 .table {
     width: 100%;
     table-layout: fixed; // Ensures cells have equal width
 }
 
+.color-legend {
+    .legend-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    }
+
+    .legend-list {
+        display: flex;
+        flex-wrap: wrap; // Allows wrapping if there's not enough space
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            margin-right: 2rem; // Space between items
+            margin-bottom: 0.5rem; // Space below items
+
+            .color-box {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+
+            .booked {
+                background-color: $booked; // Example color for booked
+            }
+
+            .selected {
+                background-color: $selected-color; // Example color for selected
+            }
+
+            .available {
+                background-color: $white-color; // Example color for available
+            }
+
+            .unavailable {
+                background-color: $unavailability; // Example color for unavailable
+            }
+
+            .arrival-day {
+                background-color: $arivalDay; // Example color for arrival day
+            }
+            .arrival-day-on-hover {
+                background-color: $arivalDayHover; // Example color for arrival day
+            }
+        }
+    }
+}
 
 .available{
-    cursor: pointer;
     cursor: default;
   }
   
@@ -24,17 +79,17 @@ $arivalDay: rgba(245, 248, 248, 0.856);
   .arrival-day {
     cursor: pointer;
     background-color: $arivalDay;
-    color: white;
+    color: $white-color;
   }
   
   /* Styles for hover effect on arrival days */
   .arrival-day:hover {
-    background-color: darkgreen;
-    color: white;
+    background-color: $arivalDayHover;
+    color: $white-color;
   }
   .unavailable {
     background-color: $unavailability;
-    color: white;
+    color: $white-color;
     cursor: not-allowed;
   }
 
@@ -42,7 +97,7 @@ $arivalDay: rgba(245, 248, 248, 0.856);
 .room-column {
     width: 15%;
     background-color: $secondary-color;
-    color: white;
+    color: $white-color;
 }
 
 .room-info {
@@ -73,8 +128,8 @@ th, td {
 }
 
 .booked {
-    background-color: $highlight-color;
-    color: white;
+    background-color: $booked;
+    color: $white-color;
     border: none; // Remove borders between booked cells
     cursor: pointer;
 }
@@ -82,7 +137,7 @@ th, td {
 
 .selected {
     background-color: $selected-color;
-    color: black;
+    color: $black-color;
     cursor: grabbing;
 }
 
@@ -102,11 +157,11 @@ th, td {
     font-size: 1rem;
     font-weight: bold;
     background-color: $secondary-color;
-    color: white;
+    color: $white-color;
 }
 
 .button{
-    background-color: #099e4f;
+    background-color: $createResButton;
     color: $white-color;
     float: right;
     margin-right: 0;
