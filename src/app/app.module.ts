@@ -24,6 +24,7 @@ import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     CdkOverlayOrigin,
     OverlayModule,
     CdkConnectedOverlay,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   providers: [provideHttpClient(), provideAnimationsAsync(), DatePipe],
   bootstrap: [AppComponent]

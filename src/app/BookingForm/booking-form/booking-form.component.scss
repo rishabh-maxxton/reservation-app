@@ -106,12 +106,27 @@
     color: #333;
   }
 
+  // .custom-snackbar {
+  //   background-color: #4caf50; // Example: Green background
+  //   color: #fff; // White text
+    
+  // }
+
+  .custom-snackbar {
+    background-color: green !important; /* Dark background */
+    color: #fff; /* White text */
+    font-size: 16px; /* Custom font size */
+    border-radius: 4px; /* Rounded corners */
+  }
+
   .booking-details {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 8px;
     background-color: #fff;
     transition: box-shadow 0.3s ease;
+    justify-content: left;
+    align-items: left;
 
     &:hover {
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -128,6 +143,8 @@
       font-size: 1rem;
       color: #666;
       margin-bottom: 8px;
+      justify-content: left;
+      align-items: left;
 
       strong {
         color: #333;
@@ -143,7 +160,9 @@
   }
 
   p {
-    text-align: center;
+    margin-right: 15%;
+    margin-left: 25%;
+    text-align: left;
     font-size: 1rem;
     color: #999;
   }

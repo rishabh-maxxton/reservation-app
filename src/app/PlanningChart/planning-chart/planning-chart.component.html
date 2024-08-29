@@ -1,17 +1,17 @@
 <h1 class="heading">Planning Chart</h1>
 <div class="container-fluid">
     <div class="row">
-        <div (change)="onLocationFilterChange()" class="col-12 col-md-2">
+        <div  class="col-12 col-md-2">
             <label class="filter-headings" for="roomFilter">Show rooms:</label>
-            <select id="roomFilter" [(ngModel)]="selectedRoomFilter" class="form-control">
+            <select (change)="onLocationFilterChange()" id="roomFilter" [(ngModel)]="selectedRoomFilter" class="form-control">
                 <option value="all">All</option>
                 <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
             </select>
         </div>
 
-        <div (change)="onMonthFilterChange()" class="col-12 col-md-2">
+        <div class="col-12 col-md-2">
             <label class="filter-headings" for="monthFilter">Select Month:</label>
-            <select id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
+            <select (change)="onMonthFilterChange()" id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
                 <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
                     {{ months[month - 1] }}
                 </option>
@@ -44,7 +44,6 @@
                 <th scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</th>
                 <ng-container *ngFor="let day of days">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
-                        [attr.colspan]="getBookingRangeColspan(room.roomId, day)"
                         [ngClass]="{
                             'booked': isDayBooked(room.roomId, day), 
                             'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
@@ -65,3 +64,9 @@
 </div>
 
 
+
+
+
+
+
+<!-- [attr.colspan]="getBookingRangeColspan(room.roomId, day)" -->

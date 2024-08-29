@@ -1,7 +1,7 @@
-import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-  import moment from 'moment';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import moment from 'moment';
 
 @Component({
   selector: 'app-booking-form',
@@ -31,8 +31,8 @@ export class BookingFormComponent implements OnInit {
     secondCtrl: ['', Validators.required],
   });
 
-  constructor(private fb: FormBuilder) {
-    
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+
     const roomData = history.state.room;
     
     console.log(roomData)
@@ -43,14 +43,14 @@ export class BookingFormComponent implements OnInit {
 
     this.bookingForm = this.fb.group({
       reservationId: [{ value: this.generateReservationId(), disabled: true }],
-      roomNo: [''],
+      roomNo: [{ value:'', disabled: true}],
       stayDateFrom: ['', [Validators.required, this.dateValidator, this.roomAvailabilityValidator.bind(this)]],
       stayDateTo: ['', [Validators.required, this.dateValidator,, this.roomAvailabilityValidator.bind(this)]],
-      numberOfDays: ['', [Validators.required, this.minMaxDayValidator.bind(this)]],
+      numberOfDays: [{value: '', disabled: true }, [Validators.required, this.minMaxDayValidator.bind(this)]],
       // numberOfDays: ['', [Validators.required, Validators.min(this.mini), Validators.max(this.maxi)]],
       totalGuests: ['', [Validators.required, Validators.min(1), this.guestCapacityValidator.bind(this)]],
-      pricePerDayPerPerson: [''],
-      totalPrice: ['']
+      pricePerDayPerPerson: [{value: '', disabled: true}],
+      totalPrice: [{value: '', disabled: true}]
     });
 
     // this.bookingForm.patchValue({
@@ -88,11 +88,13 @@ export class BookingFormComponent implements OnInit {
     });
 
     this.paymentForm = this.fb.group({
+      totalPrice: [{value: '', disabled: true}],
       paymentId: [{ value: this.generatePaymentId(), disabled: true }],
       paymentMode: ['', Validators.required],
       paidAmount: [''],
-      dueAmount: ['']
-    });
+      dueAmount: [{value : '', disabled: true}],
+    });  
+  
 
     this.loadExistingEmails();
 
@@ -109,12 +111,14 @@ export class BookingFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.bookingForm); // Check if bookingForm is initialized
-    console.log(this.bookingForm.get('roomNo')?.value); // Check roomNo value
-    console.log(this.mini);
-    console.log(this.maxi);
+    // console.log(this.bookingForm); 
+    // console.log(this.bookingForm.get('roomNo')?.value); 
+    // console.log(this.mini);
+    // console.log(this.maxi);
     this.UpdateNoOfDays();
   }
+
+  
 
   guestCapacityValidator(control: AbstractControl): ValidationErrors | null {
     const inputGuest = control.value;
@@ -236,6 +240,24 @@ export class BookingFormComponent implements OnInit {
     }
     return null;
   }
+
+  returnTotalPrice(){
+    const totalPrice = this.bookingForm.get('totalPrice')?.value || 0;
+    console.log(totalPrice);
+    this.paymentForm.patchValue({totalPrice: totalPrice});
+
+    // const totalPrice = this.bookingForm.get('totalPrice')?.value || 0;
+    // console.log(totalPrice);
+    // return totalPrice;
+  }
+
+  updateDueAmount(){
+    const totalPrice = this.bookingForm.get('totalPrice')?.value || 0;
+    console.log(totalPrice);
+    const paidAmount = this.paymentForm.get('paidAmount')?.value || 0;
+    const dueAmount = totalPrice - paidAmount;
+    this.paymentForm.patchValue({dueAmount});
+  }
   
   updateTotalPrice() {
     const totalGuests = this.bookingForm.get('totalGuests')?.value || 0;
@@ -292,7 +314,13 @@ export class BookingFormComponent implements OnInit {
     localStorage.setItem('booking_' + bookingData.bookingInfo.reservationId, JSON.stringify(bookingData));
     this.currentBooking.push(bookingData);
     console.log(this.currentBooking);
-    alert('Booking Successful!');
+    this.snackBar.open('Form submitted successfully!', 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar']
+    });
+    // alert('Booking Successful!');
 
     for(let i=0;i < localStorage.length;i++){
       const key = localStorage.key(i);
