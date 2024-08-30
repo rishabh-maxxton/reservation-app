@@ -13,7 +13,7 @@ export class RoomAvailabilityCardComponent{
   constructor() {}
 
   getRandomImage(): string {
-    const randomNumber = Math.floor(Math.random() * 17) + 1; // Generates a number between 1 and 17
+    const randomNumber = Math.floor(Math.random() * 17) + 1;
     return `asset/images/Rooms/Room (${randomNumber}).jpg`;
   }
 }

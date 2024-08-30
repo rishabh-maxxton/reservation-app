@@ -36,7 +36,7 @@
         </div>
         <div class="form-group">
           <label class="required" for="totalGuests">Total Number of Guests</label>
-          <input type="number" id="totalGuests" formControlName="totalGuests" class="form-control" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('totalGuests')?.invalid && bookingForm.get('totalGuests')?.touched">
+          <input type="number" id="totalGuests" min="1" formControlName="totalGuests" class="form-control" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('totalGuests')?.invalid && bookingForm.get('totalGuests')?.touched">
           <div *ngIf="bookingForm.get('totalGuests')?.invalid && bookingForm.get('totalGuests')?.touched" class="invalid-feedback">
             <div *ngIf="bookingForm.get('totalGuests')?.errors?.['invalidCapacity']">Maximum Guest Capacity is {{roomCapacity}}</div>
             <!-- Please enter a valid number of guests (minimum 1). -->

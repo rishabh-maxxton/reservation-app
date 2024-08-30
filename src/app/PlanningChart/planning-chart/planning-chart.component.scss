@@ -46,26 +46,26 @@ $createResButton: #099e4f;
             }
 
             .booked {
-                background-color: $booked; // Example color for booked
+                background-color: $booked; 
             }
 
             .selected {
-                background-color: $selected-color; // Example color for selected
+                background-color: $selected-color;
             }
 
             .available {
-                background-color: $white-color; // Example color for available
+                background-color: $white-color; 
             }
 
             .unavailable {
-                background-color: $unavailability; // Example color for unavailable
+                background-color: $unavailability; 
             }
 
             .arrival-day {
-                background-color: $arivalDay; // Example color for arrival day
+                background-color: $arivalDay; 
             }
             .arrival-day-on-hover {
-                background-color: $arivalDayHover; // Example color for arrival day
+                background-color: $arivalDayHover; 
             }
         }
     }
@@ -75,14 +75,12 @@ $createResButton: #099e4f;
     cursor: default;
   }
   
-  /* Styles for cells that are arrival days */
   .arrival-day {
     cursor: pointer;
     background-color: $arivalDay;
     color: $white-color;
   }
   
-  /* Styles for hover effect on arrival days */
   .arrival-day:hover {
     background-color: $arivalDayHover;
     color: $white-color;
@@ -91,6 +89,7 @@ $createResButton: #099e4f;
     background-color: $unavailability;
     color: $white-color;
     cursor: not-allowed;
+    border: none;
   }
 
 
@@ -101,7 +100,7 @@ $createResButton: #099e4f;
 }
 
 .room-info {
-    background-color: $primary-color; // Highlight for room names
+    background-color: $primary-color; 
     color: $black-color;
     height: 3.75rem;
     font-weight: 450;
@@ -115,7 +114,7 @@ th, td {
     vertical-align: middle;
     padding: 0.5rem;
     border: 1px solid $table-color;
-    white-space: nowrap; // Prevent text from wrapping
+    white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -130,7 +129,7 @@ th, td {
 .booked {
     background-color: $booked;
     color: $white-color;
-    border: none; // Remove borders between booked cells
+    border: none; 
     cursor: pointer;
 }
 

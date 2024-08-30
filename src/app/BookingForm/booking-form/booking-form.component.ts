@@ -18,8 +18,8 @@ export class BookingFormComponent implements OnInit {
   isExistingUser = false;
   existingEmails: string[] = [];
   currentBooking: any[] = [];
-  mini: any;
-  maxi: any;
+  mini: number;
+  maxi: number;
   roomCapacity: any;
 
   _formBuilder: FormBuilder = new FormBuilder;
@@ -52,10 +52,6 @@ export class BookingFormComponent implements OnInit {
       pricePerDayPerPerson: [{value: '', disabled: true}],
       totalPrice: [{value: '', disabled: true}]
     });
-
-    // this.bookingForm.patchValue({
-    //   numberOfDays: this.UpdateNoOfDays()
-    // });
 
     if (roomData) {
       this.bookingForm.patchValue({
@@ -188,7 +184,6 @@ export class BookingFormComponent implements OnInit {
         }
       }
     }
-  
     return null;
   }
 
@@ -224,7 +219,7 @@ export class BookingFormComponent implements OnInit {
     const customerData = this.getCustomerDataByEmail(selectedEmail);
     if (customerData) {
       this.customerForm.patchValue(customerData);
-      this.customerForm.get('customerId')?.disable(); // Disable customerId when selecting an existing user
+      this.customerForm.get('customerId')?.disable();
     }
   }
 
@@ -245,10 +240,6 @@ export class BookingFormComponent implements OnInit {
     const totalPrice = this.bookingForm.get('totalPrice')?.value || 0;
     console.log(totalPrice);
     this.paymentForm.patchValue({totalPrice: totalPrice});
-
-    // const totalPrice = this.bookingForm.get('totalPrice')?.value || 0;
-    // console.log(totalPrice);
-    // return totalPrice;
   }
 
   updateDueAmount(){
@@ -302,8 +293,6 @@ export class BookingFormComponent implements OnInit {
     if (this.bookingForm.invalid || this.customerForm.invalid || this.paymentForm.invalid) {
       return;
     }
-    const bookings = [];    
-    const customers = [];
     const bookingData = {
       bookingInfo: this.bookingForm.getRawValue(),
       customerInfo: this.customerForm.getRawValue(),
@@ -314,14 +303,15 @@ export class BookingFormComponent implements OnInit {
     localStorage.setItem('booking_' + bookingData.bookingInfo.reservationId, JSON.stringify(bookingData));
     this.currentBooking.push(bookingData);
     console.log(this.currentBooking);
-    this.snackBar.open('Form submitted successfully!', 'Close', {
-      duration: 4000,
+    this.snackBar.open('Booking successfully!', 'Close', {
+      duration: 3000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar']
     });
     // alert('Booking Successful!');
-
+    const bookings = [];    
+    const customers = [];
     for(let i=0;i < localStorage.length;i++){
       const key = localStorage.key(i);
       if (key && key.startsWith('CUST')) {
