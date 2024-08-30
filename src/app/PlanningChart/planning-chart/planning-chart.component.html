@@ -17,7 +17,9 @@
                 </option>
             </select>
         </div>
+        
     </div>
+    
     <div>
         <div class="color-legend mt-4">
             <h4 class="legend-title">Color Legend</h4>
@@ -31,7 +33,7 @@
             </ul>
         </div>
         <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
-            <button  class="btn button float-right" 
+            <button  class="btn button " 
             (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
             <i class="fa-solid fa-plus"></i> Create Reservation
             </button>
@@ -40,7 +42,12 @@
     </div>
 
     
-    
+    <div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-primary" (click)="previousMonth()">Previous</button>
+            <button class="btn btn-primary" (click)="nextMonth()">Next</button>
+        </div>
+    </div>
 
     <table class="table table-bordered mt-3">
         <thead>

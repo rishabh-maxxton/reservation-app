@@ -160,11 +160,15 @@ th, td {
     color: $white-color;
 }
 
+
 .button{
     background-color: $createResButton;
     color: $white-color;
+    float: between;
+}
+
+.nextButton{
     float: right;
-    margin-right: 0;
 }
 
 .container-fluid {

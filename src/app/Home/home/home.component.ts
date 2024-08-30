@@ -25,6 +25,18 @@ export class HomeComponent implements OnInit {
     maxDays: 0
   }
 
+  constructor(private roomService: RoomServiceService){}
+
+  ngOnInit(): void {
+    this.roomService.getRooms().subscribe((data: Room[]) => {
+      // console.log(data)
+      this.rooms = data;
+      this.filteredRooms = data;
+      this.locations = [...new Set(data.map(room => room.locationName))];
+    });
+    // this.filterForm.valueChanges.subscribe(() => this.onFilter());
+  }
+
   filterOutBookedRooms(): void {
     console.log("Heyy");
     const bookings = this.getBookingsFromLocalStorage();
@@ -44,20 +56,20 @@ export class HomeComponent implements OnInit {
       const key = localStorage.key(i);
       if (key && key.startsWith('booking_')) {
         const booking = JSON.parse(localStorage.getItem(key) || '{}');
-        console.log('Booking Start:', new Date(booking.bookingInfo.stayDateFrom));
-        console.log('Booking End:', new Date(booking.bookingInfo.stayDateTo));
-        console.log('Form Start:', new Date(this.formData.startDate));
-        console.log('Form End:', new Date(this.formData.endDate));
-        console.log(booking.bookingInfo.stayDateFrom)
+        // console.log('Booking Start:', new Date(booking.bookingInfo.stayDateFrom));
+        // console.log('Booking End:', new Date(booking.bookingInfo.stayDateTo));
+        // console.log('Form Start:', new Date(this.formData.startDate));
+        // console.log('Form End:', new Date(this.formData.endDate));
+        // console.log(booking.bookingInfo.stayDateFrom)
         bookings.push(booking);
       }
     }
-    
     return bookings;
   }
 
-  isDateOverlap(start1: string, end1: string, start2: string, end2: string): boolean {
-    return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
+  isDateOverlap(start1: any, end1: any, start2: any, end2: any): boolean {
+    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]');
+    // return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
   }
 
   
@@ -95,16 +107,6 @@ export class HomeComponent implements OnInit {
   }
   
 
-  constructor(private roomService: RoomServiceService){}
 
-  ngOnInit(): void {
-    this.roomService.getRooms().subscribe((data: Room[]) => {
-      // console.log(data)
-      this.rooms = data;
-      this.filteredRooms = data;
-      this.locations = [...new Set(data.map(room => room.locationName))];
-    });
-    // this.filterForm.valueChanges.subscribe(() => this.onFilter());
-  }
 }
 
