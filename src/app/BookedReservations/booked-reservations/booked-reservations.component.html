@@ -1,0 +1,53 @@
+<div class="container-fluid mt-5 mb-5 bordered">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="thead-fixed">
+          <tr>
+            <th>Room No.</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <!-- <th>Location</th> -->
+            <th>Arrival Date</th>
+            <th>Departure Date</th>
+            <th>Guest Capacity</th>
+            <th>Total Amount</th>
+            <th>Paid Amount</th>
+            <th>Due Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of bookings; let i = index">
+            <td>{{ booking.roomNo }}</td>
+            <td>{{ booking.customer.name }}</td>
+            <td>{{ booking.customer.email }}</td>
+            <td>{{ booking.customer.mobileNumber }}</td>
+            <td>{{ booking.customer.city }}</td>
+            <!-- <td>{{ booking.locationName }}</td> -->
+            <td>{{ booking.stayDateFrom }}</td>
+            <td>{{ booking.stayDateTo }}</td>
+            <td>{{ booking.totalGuests }}</td>
+            <td>{{ booking.totalPrice }}</td>
+            <td>
+              <input type="number" class="form-control" [(ngModel)]="booking.payment.paidAmount" 
+                     (ngModelChange)="paidanddue(i)">
+            </td>
+            <td>{{ booking.payment.dueAmount }}</td>
+            <td>
+              <select [(ngModel)]="booking.status" class="form-select status-dropdown" (change)="updateStatus(i, booking.status)">
+                <option value="New" class="text-dark">New</option>
+                <option value="Confirmed" class="text-dark">Confirmed</option>
+                <option value="Checked In" class="text-dark">Checked In</option>
+                <option value="Due In" class="text-dark">Due In</option>
+                <option value="Checked Out" class="text-dark">Checked Out</option>
+                <option value="Cancelled" class="text-dark">Cancelled</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

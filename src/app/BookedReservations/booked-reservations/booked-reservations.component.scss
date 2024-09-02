@@ -1,0 +1,141 @@
+/* General container styling */
+.container-fluid {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+  }
+  
+  /* Button styling */
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  /* Table styling */
+  .table {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+  }
+  
+  .table-bordered {
+    border: 1px solid #dee2e6;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+  }
+  
+  .table thead th {
+    background-color: #343a40;
+    color: #ffffff;
+  }
+  
+  .thead-fixed {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  /* Status dropdown styling */
+  .status-dropdown {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .status-dropdown option {
+    padding: 0.5rem;
+  }
+  
+  /* Input field styling */
+  .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* Dropdown styling */
+  .form-select {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .form-select option {
+    padding: 0.5rem;
+  }
+  
+  /* Add a bit of space between table rows and columns */
+  .table td, .table th {
+    padding: 0.5rem;
+  }
+  
+  /* Alert styling */
+  .alert {
+    margin-top: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  /* Custom classes for status */
+  .bg-warning {
+    background-color: #ffc107 !important;
+  }
+  
+  .bg-info {
+    background-color: #17a2b8 !important;
+  }
+  
+  .bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  .bg-light {
+    background-color: #f8f9fa !important;
+  }
+  
+  .bg-secondary {
+    background-color: #6c757d !important;
+  }
+  
+  .bg-danger {
+    background-color: #dc3545 !important;
+  }
+  
+  .text-dark {
+    color: #343a40 !important;
+  }
+  
+  .text-white {
+    color: #ffffff !important;
+  }
+  
