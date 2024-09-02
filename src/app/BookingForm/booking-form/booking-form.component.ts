@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import moment from 'moment';
+import { RoomServiceService } from '../../Service/room-service.service';
 
 @Component({
   selector: 'app-booking-form',
@@ -31,13 +32,14 @@ export class BookingFormComponent implements OnInit {
     secondCtrl: ['', Validators.required],
   });
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private roomService: RoomServiceService) {
 
     const roomData = history.state.room;
     
     console.log(roomData)
 
     this.mini = roomData.minStay;
+    console.log(this.mini);
     this.maxi = roomData.maxStay;
     this.roomCapacity = roomData.guestCapacity;
 
@@ -46,12 +48,15 @@ export class BookingFormComponent implements OnInit {
       roomNo: [{ value:'', disabled: true}],
       stayDateFrom: ['', [Validators.required, this.dateValidator, this.roomAvailabilityValidator.bind(this)]],
       stayDateTo: ['', [Validators.required, this.dateValidator,, this.roomAvailabilityValidator.bind(this)]],
-      numberOfDays: [{value: '', disabled: true }, [Validators.required, this.minMaxDayValidator.bind(this)]],
+      numberOfDays: [{value: ''}, [Validators.required, this.minMaxDayValidator.bind(this)]],
       // numberOfDays: ['', [Validators.required, Validators.min(this.mini), Validators.max(this.maxi)]],
       totalGuests: ['', [Validators.required, Validators.min(1), this.guestCapacityValidator.bind(this)]],
       pricePerDayPerPerson: [{value: '', disabled: true}],
       totalPrice: [{value: '', disabled: true}]
     });
+
+    let stayDateFrom1 = roomService.getFilterDates().stayDateFrom;
+    let stayDateTo = roomService.getFilterDates().stayDateTo;
 
     if (roomData) {
       this.bookingForm.patchValue({
@@ -127,6 +132,7 @@ export class BookingFormComponent implements OnInit {
 
   minMaxDayValidator(control: AbstractControl): ValidationErrors | null {
     // debugger;
+    console.log("yoyoy");
     const inputStay = control.value;
     // console.log(inputStay);
     // console.log(this.mini);

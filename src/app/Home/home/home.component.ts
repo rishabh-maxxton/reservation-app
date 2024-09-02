@@ -94,8 +94,8 @@ export class HomeComponent implements OnInit {
       const isLocationMatch = !this.formData.locationName || room.locationName === this.formData.locationName;
       const isPersonsMatch = !this.formData.numberOfPersons || room.numberOfPersons >= this.formData.numberOfPersons;
       const isPriceMatch = !this.formData.priceRange || room.pricePerDayPerPerson <= this.formData.priceRange;
-      const isMinDaysMatch = !this.formData.minDays || (room.minStay && room.minStay >= this.formData.minDays); 
-      const isMaxDaysMatch = !this.formData.maxDays || (room.maxStay && room.maxStay <= this.formData.maxDays);
+      const isMinDaysMatch = !this.formData.minDays || (room.minStay && room.minStay == this.formData.minDays); 
+      const isMaxDaysMatch = !this.formData.maxDays || (room.maxStay && room.maxStay == this.formData.maxDays);
       const isStartDateMatch = !this.formData.startDate || (room.stayDateFrom && new Date(this.formData.startDate) >= new Date(room.stayDateFrom));
       const isEndDateMatch = !this.formData.endDate || (room.stayDateTo && new Date(this.formData.endDate) <= new Date(room.stayDateTo));
 

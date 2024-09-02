@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Input, Output } from '@angular/core';
+import { RoomServiceService } from '../../Service/room-service.service';
 
 @Component({
   selector: 'app-search',
@@ -15,22 +16,24 @@ export class SearchComponent{
 
   public filterForm : FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private roomService: RoomServiceService) {
     this.filterForm = this.fb.group({
-      locationName: [''],
-      startDate: [''],
-      endDate: [''],
-      numberOfPersons: [''],
-      priceRange: [4000],
-      minDays: [0],
-      maxDays: [0]
+      locationName: "",
+      startDate: "",
+      endDate: "",
+      numberOfPersons: "",
+      priceRange: 4000,
+      minDays: 0,
+      maxDays: 0
     });
   }
 
+
   onSubmit(): void {
     this.Data.emit(this.filterForm);
+    console.log(this.filterForm.get('startDate')?.value)
+    this.roomService.setFilterDates(this.filterForm.get('startDate')?.value, this.filterForm.get('endDate')?.value);
   }
-
 }
 
 

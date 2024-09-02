@@ -13,6 +13,23 @@ export class RoomServiceService {
   private apiUrl2 = "https://jadhavsudhit.github.io/Booking-module/stays.json";
   private dummyStayJson = 'https://dummyjson.com/c/960c-46d6-4dfa-96a8';
 
+  public filterDates = {
+    stayDateFrom : "",
+    stayDateTo : ""
+  }
+
+  setFilterDates(stayDateFrom: string, stayDateTo : string){
+    this.filterDates.stayDateFrom = stayDateFrom;
+    this.filterDates.stayDateTo = stayDateTo;
+  }
+
+  getFilterDates(){
+    console.log(this.filterDates);
+    return this.filterDates;
+  }
+
+
+
 
   loadRooms(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl1);
@@ -53,7 +70,6 @@ export class RoomServiceService {
             combinedRooms.push(room);
           }
         });
-  
         return combinedRooms;
       })
     );

@@ -326,9 +326,9 @@ export class PlanningChartComponent implements OnInit {
       let lastDate = this.selectedDates[this.selectedDates.length - 1];
       let newDateRange = [...this.selectedDates];
       const constraints = this.getRoomConstraints(roomId);
-      if (constraints ) {
+      if (constraints) {
         const start = constraints[this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDates[0]).getDay())];
-        console.log('Constraint For Day:',start);
+        // console.log('Constraint For Day:',start);
 
           if (day > lastDate) {
             while (newDateRange.length < start.maxStay && day > lastDate) {
@@ -375,6 +375,9 @@ export class PlanningChartComponent implements OnInit {
     if (this.selectedDates.length < minStayOfDate) {
       while (this.selectedDates.length < minStayOfDate ) {
         let lastDate = this.selectedDates[this.selectedDates.length - 1];
+        if(this.isDayBooked(roomId, lastDate+1)){
+          this.selectedRoomId = 0;
+        }
         // console.log(this.isDayBooked(roomId, lastDate+1));
         if (lastDate < this.days.length && !this.isDayBooked(roomId, lastDate+1) && this.isDayAvailable(roomId, lastDate+1)) {
             // console.log(this.isDayBooked(roomId, lastDate+1));
@@ -384,9 +387,10 @@ export class PlanningChartComponent implements OnInit {
           break;
         }
       }
-    } else if (this.selectedDates.length > maxStayOfDate) {
-      this.selectedDates = this.selectedDates.slice(0, constraints[this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, day).getDay())]?.maxStay);
     }
+    //  else if (this.selectedDates.length > maxStayOfDate) {
+    //   this.selectedDates = this.selectedDates.slice(0, constraints[this.getDayOfWeekString(new Date(this.selectedYear, this.selectedMonth - 1, day).getDay())]?.maxStay);
+    // }
   }
 
   isPartOfBookedRange(roomId: number, day: number): boolean {
@@ -419,6 +423,7 @@ export class PlanningChartComponent implements OnInit {
 
   bookRoom(room: any, stayDateFrom: string, stayDateTo: string) {
     let price = this.getPrice(room);
+    console.log(stayDateFrom, stayDateTo , "yoyoyoyo");
     this.router.navigate(['/form'], {
       state: {
         room: {
