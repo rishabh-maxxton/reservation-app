@@ -232,7 +232,7 @@
         </div>
         <div class="d-flex">
           <button mat-button matStepperPrevious>Back</button>
-          <button type="submit" mat-button matStepperNext [disabled]="paymentForm.invalid">Book</button>
+          <button type="submit" mat-button matStepperNext [disabled]="paymentForm.invalid" (click) = "updateStatus()">Book</button>
         </div>
       </form>
     </div>

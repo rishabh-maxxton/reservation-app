@@ -25,6 +25,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BookedReservationsComponent } from './BookedReservations/booked-reservations/booked-reservations.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     NavbarLogoComponent,
     BookingFormComponent,
     PlanningChartComponent,
+    BookedReservationsComponent,
   ],
   imports: [
     BrowserModule,
