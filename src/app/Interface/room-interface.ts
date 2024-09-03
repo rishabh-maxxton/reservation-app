@@ -4,7 +4,7 @@ export interface Room {
     locationName: string;
     roomName: string;
     pricePerDayPerPerson: number;
-    numberOfPersons: number;
+    guestCapacity: number;
     stayDateFrom?: string;
     stayDateTo?: string;
     arrivalDays?: string[];

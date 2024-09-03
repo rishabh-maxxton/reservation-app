@@ -163,13 +163,12 @@
       if (!selectedDateStr) {
         return null;
       }
-
+    
       const selectedDate = moment(selectedDateStr, 'YYYY-MM-DD', true);
       if (!selectedDate.isValid()) {
         return { invalidDate: true };
       }
     
-      // console.log(this.bookingForm.get('roomNo')?.value);
       const roomNo = this.bookingForm.get('roomNo')?.value;
       if (!roomNo) {
         return null;
@@ -186,16 +185,65 @@
           const bookingEnd = moment(bookingData.bookingInfo.stayDateTo);
           const storedRoomNo = bookingData.bookingInfo.roomNo;
     
-          if (
-            storedRoomNo === roomNo &&
-            selectedDate.isBetween(bookingStart, bookingEnd, null, '[]')
-          ) {
-            return { roomUnavailable: true };
+          if (storedRoomNo === roomNo) {
+            // If validating 'stayDateFrom', exclude the booking end date
+            if (control === this.bookingForm.get('stayDateFrom')) {
+              if (selectedDate.isSameOrAfter(bookingStart) && selectedDate.isBefore(bookingEnd)) {
+                return { roomUnavailable: true };
+              }
+            }
+    
+            // If validating 'stayDateTo', exclude the booking start date
+            if (control === this.bookingForm.get('stayDateTo')) {
+              if (selectedDate.isAfter(bookingStart) && selectedDate.isSameOrBefore(bookingEnd)) {
+                return { roomUnavailable: true };
+              }
+            }
           }
         }
       }
       return null;
     }
+    
+
+    // roomAvailabilityValidator(control: AbstractControl): ValidationErrors | null {
+    //   const selectedDateStr = control.value;
+    //   if (!selectedDateStr) {
+    //     return null;
+    //   }
+
+    //   const selectedDate = moment(selectedDateStr, 'YYYY-MM-DD', true);
+    //   if (!selectedDate.isValid()) {
+    //     return { invalidDate: true };
+    //   }
+    
+    //   // console.log(this.bookingForm.get('roomNo')?.value);
+    //   const roomNo = this.bookingForm.get('roomNo')?.value;
+    //   if (!roomNo) {
+    //     return null;
+    //   }
+    
+    //   for (let i = 0; i < localStorage.length; i++) {
+    //     const key = localStorage.key(i);
+    //     if (key && key.startsWith('booking_')) {
+    //       const bookingData = JSON.parse(localStorage.getItem(key)!);
+    //       if (!bookingData?.bookingInfo) {
+    //         continue;
+    //       }
+    //       const bookingStart = moment(bookingData.bookingInfo.stayDateFrom);
+    //       const bookingEnd = moment(bookingData.bookingInfo.stayDateTo);
+    //       const storedRoomNo = bookingData.bookingInfo.roomNo;
+    
+    //       if (
+    //         storedRoomNo === roomNo &&
+    //         selectedDate.isBetween(bookingStart, bookingEnd, null, '[]')
+    //       ) {
+    //         return { roomUnavailable: true };
+    //       }
+    //     }
+    //   }
+    //   return null;
+    // }
 
 
     loadExistingEmails() {
@@ -276,14 +324,12 @@
       else{
         this.bookingForm.patchValue({status: "New"});
       }
-      
     }
-
 
     UpdateNoOfDays(){
       const startDate = new Date(this.bookingForm.get('stayDateFrom')?.value);
       const endDate = new Date(this.bookingForm.get('stayDateTo')?.value);
-      const numberOfDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+      const numberOfDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
       this.bookingForm.patchValue({numberOfDays});
     }
 

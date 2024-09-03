@@ -1,7 +1,7 @@
 <h1 class="heading">Planning Chart</h1>
 <div class="container-fluid">
     <div class="row">
-        <div  class="col-12 col-md-2">
+        <div  class="col-12 col-lg-2">
             <label class="filter-headings" for="roomFilter">Show rooms:</label>
             <select (change)="onLocationFilterChange()" id="roomFilter" [(ngModel)]="selectedRoomFilter" class="form-control">
                 <option value="all">All</option>
@@ -9,7 +9,7 @@
             </select>
         </div>
 
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-lg-2">
             <label class="filter-headings" for="monthFilter">Select Month:</label>
             <select (change)="onMonthFilterChange()" id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
                 <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
@@ -68,11 +68,15 @@
                 <ng-container *ngFor="let day of days">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
                         [ngClass]="{
-                            'booked': isDayBooked(room.roomId, day), 
+                            'cell': true,
+                            'start': isStartOfBooking(room.roomId, day),
+                            'end': isEndOfBooking(room.roomId, day),
+                            'middle': isMiddleCell(room.roomId, day),
                             'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
                             'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
-                            'unavailable': !isDayAvailable(room.roomId, day),
-                            'arrival-day': isArrivalDay(room.roomId, day)
+                            'unavailable': !isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
+                            'arrival-day': isArrivalDay(room.roomId, day),
+                            'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day)
                         }"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"
@@ -87,6 +91,8 @@
 </div>
 
 
+<!-- 'booked': isDayBooked(room.roomId, day),
+                            'half-cell': isDayBooked(room.roomId, day), -->
 
 
 

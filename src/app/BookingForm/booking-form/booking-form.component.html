@@ -14,14 +14,14 @@
         <div class="row">
           <div class="col-6 form-group">
             <label class="required" for="stayDateFrom">Stay Date From</label>
-            <input type="date" id="stayDateFrom" formControlName="stayDateFrom" class="form-control" (input)="UpdateNoOfDays()" [class.is-invalid]="bookingForm.get('stayDateFrom')?.invalid && bookingForm.get('stayDateFrom')?.touched">
+            <input type="date" id="stayDateFrom" formControlName="stayDateFrom" class="form-control" (input)="UpdateNoOfDays()" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('stayDateFrom')?.invalid && bookingForm.get('stayDateFrom')?.touched">
             <div *ngIf="bookingForm.get('stayDateFrom')?.invalid && bookingForm.get('stayDateFrom')?.touched" class="invalid-feedback">
               Please select a valid start date.
             </div>
           </div>
           <div  class="col-6 form-group">
             <label class="required" for="stayDateTo">Stay Date To</label>
-            <input type="date" id="stayDateTo" formControlName="stayDateTo" class="form-control" (input)="UpdateNoOfDays()" [class.is-invalid]="bookingForm.get('stayDateTo')?.invalid && bookingForm.get('stayDateTo')?.touched">
+            <input type="date" id="stayDateTo" formControlName="stayDateTo" class="form-control" (input)="UpdateNoOfDays()" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('stayDateTo')?.invalid && bookingForm.get('stayDateTo')?.touched">
             <div *ngIf="bookingForm.get('stayDateTo')?.invalid && bookingForm.get('stayDateTo')?.touched" class="invalid-feedback">
               Please select a valid end date.
             </div>
@@ -29,7 +29,7 @@
         </div>
         <div class="form-group">
           <label class="required" for="numberOfDays">Number of Days</label>
-          <input type="number" id="numberOfDays" formControlName="numberOfDays" class="form-control" (onChange)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('numberOfDays')?.invalid && bookingForm.get('numberOfDays')?.touched">
+          <input type="number" id="numberOfDays" formControlName="numberOfDays" class="form-control" (input)="updateTotalPrice()" [class.is-invalid]="bookingForm.get('numberOfDays')?.invalid && bookingForm.get('numberOfDays')?.touched">
           <div *ngIf="bookingForm.get('numberOfDays')?.invalid && bookingForm.get('numberOfDays')?.touched" class="invalid-feedback">
             <div *ngIf="bookingForm.get('numberOfDays')?.errors?.['invalidStay']">Minimum Stay should be {{mini}} and Maximum Stay should be {{maxi}}</div>
           </div>

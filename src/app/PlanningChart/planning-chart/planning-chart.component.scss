@@ -10,6 +10,8 @@ $unavailability: #d3d0d0bd;
 $arivalDay: rgba(245, 248, 248, 0.856);
 $arivalDayHover: darkgreen;
 $createResButton: #099e4f;
+$departureDay: rgb(235, 106, 235);
+
 
 .table {
     width: 100%;
@@ -126,12 +128,169 @@ th, td {
     font-weight: 450;
 }
 
-.booked {
-    background-color: $booked;
-    color: $white-color;
-    border: none; 
-    cursor: pointer;
+// .booked {
+//     background-color: $booked;
+//     color: $white-color;
+//     border: none; 
+//     cursor: pointer;
+// }
+
+.cell {
+    position: relative; // For positioning pseudo-elements
+    margin: 10px; // Small margin to create separation between cells
+    overflow: hidden; // Ensure content doesn’t overflow the rounded corners
 }
+
+.start {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    // padding: 5px 0; // Adjust padding to decrease height
+    // margin-top: 3px;
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    overflow: hidden; // To ensure the pseudo-element is contained
+}
+
+// Start pseudo-element
+.start::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0rem;
+    width: 60%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding-top: 100%;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: $booked;
+    right: 0; // Position to the right
+    z-index: 1;
+}
+
+// .middle {
+//     background-color: $booked;
+//     color: $white-color;
+//     border: none;
+//     padding-top: 0%;
+//     cursor: pointer;
+// }
+
+
+.middle {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    // padding: 5px 0px; // Adjust padding to decrease height
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    // margin-top: 3px;
+    overflow: hidden; // To ensure the pseudo-element is contained
+   
+    // padding-top: 0rem;
+}
+
+.middle::before{
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding-top: 100%;
+    background-color: $booked;
+    z-index: 1;
+}
+
+.highlighted {
+    background-color: $departureDay; /* Yellow glow */
+  }
+// Style for the end of a booking
+.end {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    overflow: hidden; // To ensure the pseudo-element is contained
+}
+
+// End pseudo-element
+.end::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    width: 30%;
+    background-color: $booked;
+    left: 0; // Position to the left
+    z-index: 1;
+}
+
+// .booked {
+//     background-color: $booked;
+//     color: $white-color;
+//     border: none; 
+//     cursor: pointer;
+//     position: relative; // Required for pseudo-elements
+
+//     // Styles for the start and end cells with half-cell effect
+//     // &.half-cell {
+//         position: relative;
+
+//         &.start::before {
+//             content: '';
+//             display: block;
+//             position: absolute;
+//             top: 0;
+//             bottom: 0;
+//             width: 50%;
+//             background-color: green;
+//             right: 0;
+//             z-index: 1; // Ensure it's above other content
+//         }
+
+//         &.end::before {
+//             content: '';
+//             display: block;
+//             position: absolute;
+//             top: 0;
+//             bottom: 0;
+//             width: 50%;
+//             background-color: green;
+//             left: 0;
+//             z-index: 1; // Ensure it's above other content
+//         }
+//     // }
+
+//     // Style for middle cells
+//     &.full-cell {
+//         background-color: $booked;
+//     }
+// }
+
+
 
 
 .selected {

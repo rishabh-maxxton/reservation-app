@@ -28,9 +28,6 @@ export class RoomServiceService {
     return this.filterDates;
   }
 
-
-
-
   loadRooms(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl1);
   }

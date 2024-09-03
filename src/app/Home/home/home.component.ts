@@ -84,15 +84,14 @@ export class HomeComponent implements OnInit {
     this.formData.priceRange = data.controls['priceRange'].value;
     this.formData.minDays = data.controls['minDays'].value;
     this.formData.maxDays = data.controls['maxDays'].value;
-    // console.log("Yayyy", this.formData);
-
+    console.log("Yayyy", this.formData);
     this.onFilter();
   }
 
   onFilter(): void {
     this.filteredRooms = this.rooms.filter(room => {
       const isLocationMatch = !this.formData.locationName || room.locationName === this.formData.locationName;
-      const isPersonsMatch = !this.formData.numberOfPersons || room.numberOfPersons >= this.formData.numberOfPersons;
+      const isPersonsMatch = !this.formData.numberOfPersons || room.guestCapacity >= this.formData.numberOfPersons;
       const isPriceMatch = !this.formData.priceRange || room.pricePerDayPerPerson <= this.formData.priceRange;
       const isMinDaysMatch = !this.formData.minDays || (room.minStay && room.minStay == this.formData.minDays); 
       const isMaxDaysMatch = !this.formData.maxDays || (room.maxStay && room.maxStay == this.formData.maxDays);
@@ -102,6 +101,7 @@ export class HomeComponent implements OnInit {
       return isLocationMatch && isPersonsMatch && isPriceMatch && isMinDaysMatch && isMaxDaysMatch && isStartDateMatch && isEndDateMatch;
       
     });
+    console.log(this.rooms);
     console.log(this.filteredRooms);
     this.filterOutBookedRooms();
   }
