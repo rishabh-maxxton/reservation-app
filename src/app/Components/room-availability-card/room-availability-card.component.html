@@ -22,8 +22,8 @@
             <p class="card-text">Departure Days: {{ room.departureDays?.join(", ") }}</p>
             <p class="card-text">Min Stay: {{ room.minStay }} days</p>
             <p class="card-text">Max Stay: {{ room.maxStay }} days</p>
-            <button class="btn btn-primary book-now-btn" (click)="bookRoom(room.roomId, room.pricePerDayPerPerson, room.minStay, room.maxStay, room.guestCapacity)">Book Now</button>
-            <!-- <button routerLink="/form" [state]="{ room: room,  }" class="btn btn-primary book-now-btn">Book Now</button> -->
+            <!-- <button class="btn btn-primary book-now-btn" (click)="bookRoom(room.roomId, room.pricePerDayPerPerson, room.minStay, room.maxStay, room.guestCapacity)">Book Now</button> -->
+            <button routerLink="/form" [state]="{ room: room,  }" class="btn btn-primary book-now-btn">Book Now</button>
           </div>
         </div>
       </div>

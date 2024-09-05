@@ -9,15 +9,14 @@
             </select>
         </div>
 
-        <div class="col-12 col-lg-2">
+        <!-- <div class="col-12 col-lg-2">
             <label class="filter-headings" for="monthFilter">Select Month:</label>
             <select (change)="onMonthFilterChange()" id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
                 <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
                     {{ months[month - 1] }}
                 </option>
             </select>
-        </div>
-        
+        </div>         -->
     </div>
     
     <div>
@@ -41,40 +40,38 @@
 
     </div>
 
-    
-    <div>
-        <div class="d-flex justify-content-between">
-            <button class="btn btn-primary" (click)="previousMonth()">Previous</button>
-            <button class="btn btn-primary" (click)="nextMonth()">Next</button>
-        </div>
-    </div>
 
+    <div class="booking-chart-container">
+
+    
     <table class="table table-bordered mt-3">
-        <thead>
+        <thead class="sticky-top">
             <tr class="thead-light">
                 <th class="room-column" rowspan="3">Rooms</th>
-                <th [attr.colspan]="days.length" class="month-year">{{ months[selectedMonth - 1] }} - {{selectedYear}}</th>
+                <th *ngFor="let monthRange of dateRange" [attr.colspan]="monthRange.days.length" class="month-year">{{ months[monthRange.month]  }} - {{monthRange.year}}</th>
             </tr>
             <tr>
-                <th *ngFor="let day of days" class="weekday">{{ getWeekday(day) }}</th>
+                <th *ngFor="let day of dateArray" class="weekday" >
+                        {{ day | date: "EEE" }}
+                </th>
             </tr>
             <tr>
-                <th *ngFor="let day of days" class="day">{{ day }}</th>
+                <th *ngFor="let day of dateArray" class="day">{{ day | date: "dd"}}</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let room of filteredRooms">
-                <th scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</th>
-                <ng-container *ngFor="let day of days">
+                <td scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</td>
+                <ng-container *ngFor="let day of dateArray">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
                         [ngClass]="{
                             'cell': true,
+                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
+                            'available': isDayAvailable(room.roomId, day) ,
+                            'unavailable': !isDayAvailable(room.roomId, day) ,
                             'start': isStartOfBooking(room.roomId, day),
                             'end': isEndOfBooking(room.roomId, day),
                             'middle': isMiddleCell(room.roomId, day),
-                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
-                            'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
-                            'unavailable': !isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
                             'arrival-day': isArrivalDay(room.roomId, day),
                             'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day)
                         }"
@@ -89,13 +86,22 @@
         </tbody>
     </table>
 </div>
+</div>
 
 
-<!-- 'booked': isDayBooked(room.roomId, day),
-                            'half-cell': isDayBooked(room.roomId, day), -->
+<!-- (mousedown)="startSelection(room.roomId, day)"
+(mouseover)="continueSelection(room.roomId, day)"
+(mouseup)="endSelection(room.roomId, day)"
+matTooltip="{{ getTooltipContent(room.roomId, day) }}"
+matTooltipPosition="below" -->
 
 
+<!-- 'start': isStartOfBooking(room.roomId, day),
+'end': isEndOfBooking(room.roomId, day),
+'middle': isMiddleCell(room.roomId, day),
+'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
+'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
+'unavailable': !isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
+'arrival-day': isArrivalDay(room.roomId, day),
+'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day) -->
 
-
-
-<!-- [attr.colspan]="getBookingRangeColspan(room.roomId, day)" -->

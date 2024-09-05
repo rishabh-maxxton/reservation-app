@@ -1,0 +1,333 @@
+$table-color: #dee2e6;
+$primary-color: #e9e6e6;
+$secondary-color: #778ca3;
+$booked: #20bf6b;
+$selected-color: #a5b1c2;
+$white-color: #ffffff;
+$black-color: #000000;
+$border-color: #dee2e6;
+$unavailability: #d3d0d0bd;
+$arivalDay: rgba(245, 248, 248, 0.856);
+$arivalDayHover: darkgreen;
+$createResButton: #099e4f;
+$departureDay: rgb(235, 106, 235);
+
+
+.table {
+    width: 100%;
+}
+
+.available{
+    cursor: default;
+}
+  
+.arrival-day {
+cursor: pointer;
+background-color: $arivalDay;
+color: $white-color;
+}
+  
+.arrival-day:hover {
+    background-color: $arivalDayHover;
+    color: $white-color;
+}
+
+.unavailable {
+background-color: $unavailability;
+color: $white-color;
+cursor: not-allowed;
+border: none;
+}
+
+
+.room-column {
+    position: sticky;
+    left: 0;
+    width: 15%;
+    background-color: $secondary-color;
+    color: $white-color;
+}
+
+.room-info {
+    position: sticky;
+    left: 0;
+    background-color: $primary-color; 
+    color: $black-color;
+    height: 3.75rem;
+    font-weight: 450;
+    text-align: left;
+    padding-left: 0.625rem;
+    z-index: 999;
+}
+
+th, td {
+    text-align: center;
+    height: 2.5rem;
+    width: 2.5rem;
+    vertical-align: middle;
+    padding: 0.5rem;
+    border: 1px solid $table-color;
+    white-space: nowrap; 
+    // overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.weekday, .day {
+    font-size: 0.85rem;
+    background-color: $primary-color;
+    font-weight: 450;
+}
+
+// .booked {
+//     background-color: $booked;
+//     color: $white-color;
+//     border: none; 
+//     cursor: pointer;
+// }
+
+.cell {
+    position: relative; // For positioning pseudo-elements
+    margin: 10px; // Small margin to create separation between cells
+    overflow: hidden; // Ensure content doesn’t overflow the rounded corners
+    
+}
+
+.start {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    // padding: 5px 0; // Adjust padding to decrease height
+    // margin-top: 3px;
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    overflow: hidden; // To ensure the pseudo-element is contained
+}
+
+// Start pseudo-element
+.start::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0rem;
+    width: 60%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding-top: 100%;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: $booked;
+    right: 0; // Position to the right
+    z-index: 1;
+}
+
+// .middle {
+//     background-color: $booked;
+//     color: $white-color;
+//     border: none;
+//     padding-top: 0%;
+//     cursor: pointer;
+// }
+
+
+.middle {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    // padding: 5px 0px; // Adjust padding to decrease height
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    // margin-top: 3px;
+    overflow: hidden; // To ensure the pseudo-element is contained
+   
+    // padding-top: 0rem;
+}
+
+.middle::before{
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding-top: 100%;
+    background-color: $booked;
+    z-index: 1;
+}
+
+.highlighted {
+    background-color: $departureDay; /* Yellow glow */
+  }
+// Style for the end of a booking
+.end {
+    position: relative; // Ensure positioning context
+    background-color: $white-color;
+    color: $white-color;
+    border: none;
+    cursor: pointer;
+    padding-top: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 3.75rem;
+    overflow: hidden; // To ensure the pseudo-element is contained
+}
+
+// End pseudo-element
+.end::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    width: 30%;
+    background-color: $booked;
+    left: 0; // Position to the left
+    z-index: 1;
+}
+
+
+
+.selected {
+    background-color: $selected-color;
+    color: $black-color;
+    cursor: grabbing;
+}
+
+.heading{
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: 450;
+}
+
+.filter-headings{
+    font-weight: 550;
+    font-size: larger;
+}
+
+.month-year {
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: $secondary-color;
+    color: $white-color;
+}
+
+.button{
+    background-color: $createResButton;
+    color: $white-color;
+    float: between;
+}
+
+
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.625rem;
+}
+
+
+.thh{
+    overflow-x: auto;   
+}
+
+.thead-light{
+    position: sticky;
+    top: 0;
+}
+
+.booking-chart-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-height: 100vh;
+    margin-top: 20px;
+    background: $white-color;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .color-legend {
+    .legend-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    }
+
+    .legend-list {
+        display: flex;
+        flex-wrap: wrap; // Allows wrapping if there's not enough space
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            margin-right: 2rem; // Space between items
+            margin-bottom: 0.5rem; // Space below items
+
+            .color-box {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+
+            .booked {
+                background-color: $booked; 
+            }
+
+            .selected {
+                background-color: $selected-color;
+            }
+
+            .available {
+                background-color: $white-color; 
+            }
+
+            .unavailable {
+                background-color: $unavailability; 
+            }
+
+            .arrival-day {
+                background-color: $arivalDay; 
+            }
+            .arrival-day-on-hover {
+                background-color: $arivalDayHover; 
+            }
+        }
+    }
+}
