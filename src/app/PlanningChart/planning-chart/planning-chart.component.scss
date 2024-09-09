@@ -227,6 +227,7 @@ th, td {
     padding-top: 4px;
     padding-left: 0;
     padding-right: 0;
+    
     padding-bottom: 3.75rem;
     overflow: hidden; // To ensure the pseudo-element is contained
 }
@@ -240,6 +241,7 @@ th, td {
     bottom: 0;
     margin-top: 10%;
     margin-bottom: 10%;
+    padding-top: 100%;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     width: 30%;

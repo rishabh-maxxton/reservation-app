@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import moment from 'moment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-planning-chart2',
@@ -14,6 +15,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 })
 export class PlanningChart2Component implements OnInit{
   rooms:  Room[] = [];
+  startDate: Date = new Date();
+  endDate: Date = new Date('2025-01-31');
   filteredRooms: Room[] = [];
   days: number[] = [];
   locations: string[] = [];
@@ -46,7 +49,11 @@ export class PlanningChart2Component implements OnInit{
     private router: Router,
     private datePipe: DatePipe,
     private snackBar: MatSnackBar,
-  ) {}
+    private sanitizer: DomSanitizer
+  ) {
+    const today = new Date();
+    this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  }
 
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
@@ -56,9 +63,9 @@ export class PlanningChart2Component implements OnInit{
     });
 
     this.generateDateRange();
-    let startDate: Date = new Date('2024-07-01');
-    let endDate: Date = new Date('2025-01-31');
-    this.dateArray = this.generateDateArray(startDate, endDate);
+    // let startDate: Date = new Date('2024-07-01');
+    // let endDate: Date = new Date('2025-01-31');
+    this.dateArray = this.generateDateArray(this.startDate, this.endDate);
     // console.log(this.dateArray);
 
     this.roomService.loadAvailability().subscribe((data: any[]) => {
@@ -71,12 +78,14 @@ export class PlanningChart2Component implements OnInit{
     // this.generateDaysInMonth(this.selectedYear, this.selectedMonth);
   }
 
+  
+
 
   generateDateRange() {
-    const startDate = new Date('2024-07-01');
-    const endDate = new Date('2025-01-31');
+    const startDate = new Date(this.startDate);
+    const endDate = new Date(this.endDate);
     
-
+    this.dateRange = [];
     while (startDate <= endDate) {
       const year = startDate.getFullYear();
       const month = startDate.getMonth();
@@ -101,7 +110,7 @@ export class PlanningChart2Component implements OnInit{
     const dates: Date[] = [];
     const currentDate = new Date(startDate);
   
-    while (currentDate <= endDate) {
+    while (currentDate <= new Date(endDate)) {
       dates.push(new Date(currentDate)); // Add the current date to the array
       // let num = Number(new Date(this.currentDate).getDate)
       // this.dateNumber.push(num)
@@ -110,19 +119,35 @@ export class PlanningChart2Component implements OnInit{
   
     return dates;
   }
+
+  updateDateArrayAndRange(): void {
+    this.dateArray = this.generateDateArray(this.startDate, this.endDate);
+    console.log(this.dateArray);
+    console.log(this.startDate, this.endDate);
+    this.generateDateRange();
+    console.log(this.dateRange);
+  }
+
+  onStartDateChange(): void {
+    this.updateDateArrayAndRange();
+  }
+
+  onEndDateChange(): void {
+    this.updateDateArrayAndRange();
+  }
   
 
   getTooltipContent(roomId: number, day: Date): string {
     // console.log("hey");
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth());
+    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
     
     const booking = bookings.find(b => day.getDate() >= b.startDate && day.getDate() <= b.endDate);
 
     if (booking) {
-        const startDateFormatted = `${booking.startDate}-${this.months[day.getMonth()]}-${day.getFullYear()}`;
-        const endDateFormatted = `${booking.endDate}-${this.months[day.getMonth()]}-${day.getFullYear()}`;
+        const startDateFormatted = `${booking.startDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
+        const endDateFormatted = `${booking.endDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
         // console.log(startDateFormatted, endDateFormatted)
-        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted}`;
+        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted} \n status: ${booking.status}`;
     }
     return '';
   }
@@ -197,6 +222,8 @@ export class PlanningChart2Component implements OnInit{
     this.applyFilters();
   }
 
+  
+
   getBookingsFromLocalStorage(): any[] {
     const bookings = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -224,24 +251,60 @@ export class PlanningChart2Component implements OnInit{
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ startDate: number, endDate: number, customerName: string }> {
+  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
-      return booking.bookingInfo.roomNo === roomId &&
-             bookingStartDate.getMonth() === month - 1 &&
-             bookingEndDate.getMonth() === month - 1;
+      return booking.bookingInfo.roomNo === roomId
     });
+    //   return booking.bookingInfo.roomNo === roomId &&
+    //          bookingStartDate.getMonth() === month - 1 &&
+    //          bookingEndDate.getMonth() === month - 1;
+    // });
 
     // console.log(roomBookings);
 
     return roomBookings.map(booking => ({
+      roomId: roomId,
       startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
       endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
       customerName: booking.customerInfo.name,
+      status: booking.bookingInfo.status
     })).sort((a, b) => a.startDate - b.startDate);
     
   }
+
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'Confirmed':
+        return '#f39c12';
+      case 'Checked In':
+        return '#3498db';
+      case 'Due In':
+        return '#9b59b6';
+      case 'Checked Out':
+        return '#2ecc71';
+      case 'Cancelled':
+        return '#e74c3c';
+      default:
+        return '#20bf6b'; // Default booked color
+    }
+  }
+
+  getBookingStyle(status: string): string{
+    const color = this.getStatusColor(status);
+    return color;
+  }
+
+  // Check booking status and apply styles
+  getBookingStatus(roomId: number, day: Date): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
+    const booking = bookings.find(b => roomId === b.roomId && day.getDate() >= b.startDate && day.getDate() <= b.endDate);
+    // console.log(booking);
+    return booking ? booking.status : 'Available'; // Return status or default
+  }
+
 
   // isDayBooked(roomId: number, day: number): boolean {
   //   const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
@@ -275,6 +338,17 @@ isMiddleCell(roomId: number, day: Date): boolean {
   }
   return false;
 }
+
+  isDateBeforeToday(date: Date): boolean {
+    const today = new Date();
+    
+    // Set time to the start of the day (midnight) to ignore the time portion in comparison
+    today.setHours(0, 0, 0, 0);
+    
+    // this.isSelecting = false;
+    // Compare the provided date to today
+    return date < today;
+  }
 
 
   isDayAvailable(roomId: number, day: Date): boolean {
@@ -432,10 +506,27 @@ isMiddleCell(roomId: number, day: Date): boolean {
     // Set highlighted days for the specific room
     this.highlightedDays[roomId] = daysToHighlight;
   }
+
+  highlightedDaysCompare(roomId: number, day: Date): boolean{
+    if (!this.highlightedDays[roomId]) {
+        return false; // No dates for this roomId
+    }
+    
+    // Format the day to string
+    const formattedDay = this.formatDateToString(day);
+    
+    // Check if any date in highlightedDays[roomId] matches formattedDay
+    return this.highlightedDays[roomId].some(date => this.formatDateToString(date) === formattedDay);
+  }
+
+
+
+
+
   
 
   startSelection(roomId: number, day: Date) {
-    if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;
+    if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day) || this.isDateBeforeToday(day)) return;
     console.log(new Date(day.getFullYear(), day.getMonth(), day.getDate()));
     this.isSelecting = true;
     this.selectedRoomId = roomId;
@@ -444,9 +535,21 @@ isMiddleCell(roomId: number, day: Date): boolean {
     this.extractRoomConstraints1();
     this.highlightDepartureDays(roomId, day);
   }
-  
 
- 
+
+  formatDateToString(date: Date): string {
+    // Format date as YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+  selctedDateCompare(day: Date): boolean {
+    const formattedDay = this.formatDateToString(day);
+    return this.selectedDates.some(date => this.formatDateToString(date) === formattedDay);
+  }
+  
 
   continueSelection(roomId: number, day: Date) {
     if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;

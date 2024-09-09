@@ -9,14 +9,14 @@
             </select>
         </div>
 
-        <!-- <div class="col-12 col-lg-2">
-            <label class="filter-headings" for="monthFilter">Select Month:</label>
-            <select (change)="onMonthFilterChange()" id="monthFilter" [(ngModel)]="selectedMonth" class="form-control">
-                <option *ngFor="let month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" [value]="month">
-                    {{ months[month - 1] }}
-                </option>
-            </select>
-        </div>         -->
+        <div class="col-12 col-lg-3">
+            <label class="filter-headings" for="startDate">Start Date:</label>
+            <input type="date" id="startDate" [(ngModel)]="startDate" (change)="onStartDateChange()" class="form-control" />
+        </div>
+        <div class="col-12 col-lg-3">
+            <label class="filter-headings" for="endDate">End Date:</label>
+            <input type="date" id="endDate" [(ngModel)]="endDate" (change)="onEndDateChange()" class="form-control" />
+        </div>
     </div>
     
     <div>
@@ -64,16 +64,18 @@
                 <td scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</td>
                 <ng-container *ngFor="let day of dateArray">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
+                        [ngStyle]="{'--booking-color': getBookingStyle(getBookingStatus(room.roomId, day))}"
                         [ngClass]="{
                             'cell': true,
-                            'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
+                            'selected': selectedRoomId === room.roomId && selctedDateCompare(day),
                             'available': isDayAvailable(room.roomId, day) ,
                             'unavailable': !isDayAvailable(room.roomId, day) ,
-                            'start': isStartOfBooking(room.roomId, day),
+                            'start': isStartOfBooking(room.roomId, day) ,
                             'end': isEndOfBooking(room.roomId, day),
                             'middle': isMiddleCell(room.roomId, day),
                             'arrival-day': isArrivalDay(room.roomId, day),
-                            'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day)
+                            'highlighted': highlightedDays[room.roomId] && highlightedDaysCompare(room.roomId, day),
+                            'prevDays': isDateBeforeToday(day)
                         }"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"

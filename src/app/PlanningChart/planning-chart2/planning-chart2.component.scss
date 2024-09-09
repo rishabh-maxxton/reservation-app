@@ -12,9 +12,9 @@ $arivalDayHover: darkgreen;
 $createResButton: #099e4f;
 $departureDay: rgb(235, 106, 235);
 
-
 .table {
     width: 100%;
+    table-layout: auto;
 }
 
 .available{
@@ -39,6 +39,11 @@ cursor: not-allowed;
 border: none;
 }
 
+.prevDays{
+    color: $white-color;
+    cursor: not-allowed;
+}
+
 
 .room-column {
     position: sticky;
@@ -53,7 +58,7 @@ border: none;
     left: 0;
     background-color: $primary-color; 
     color: $black-color;
-    height: 3.75rem;
+    height: 6rem;
     font-weight: 450;
     text-align: left;
     padding-left: 0.625rem;
@@ -62,13 +67,13 @@ border: none;
 
 th, td {
     text-align: center;
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 3.5rem;
+    // width: 2.5rem;
     vertical-align: middle;
     padding: 0.5rem;
     border: 1px solid $table-color;
     white-space: nowrap; 
-    // overflow: hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
 }
@@ -77,6 +82,7 @@ th, td {
     font-size: 0.85rem;
     background-color: $primary-color;
     font-weight: 450;
+    min-width: 80px;
 }
 
 // .booked {
@@ -93,9 +99,19 @@ th, td {
     
 }
 
+// :root {
+//     --booked-color: #20bf6b;
+//     --confirmed-color: #f39c12;
+//     --checked-in-color: #3498db;
+//     --due-in-color: #9b59b6;
+//     --checked-out-color: #2ecc71;
+//     --cancelled-color: #e74c3c;
+// }
+
 .start {
     position: relative; // Ensure positioning context
     background-color: $white-color;
+    // background-color: var(--booking-color);
     color: $white-color;
     border: none;
     cursor: pointer;
@@ -109,30 +125,23 @@ th, td {
 }
 
 // Start pseudo-element
-.start::after {
+.start::before {
     content: '';
+    background-color: var(--booking-color);
     display: block;
     position: absolute;
     top: 0;
-    bottom: 0rem;
+    bottom: 0;
     width: 60%;
     margin-top: 10%;
     margin-bottom: 10%;
     padding-top: 100%;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    background-color: $booked;
+    
     right: 0; // Position to the right
-    z-index: 1;
+    z-index: 3;
 }
-
-// .middle {
-//     background-color: $booked;
-//     color: $white-color;
-//     border: none;
-//     padding-top: 0%;
-//     cursor: pointer;
-// }
 
 
 .middle {
@@ -152,7 +161,7 @@ th, td {
     // padding-top: 0rem;
 }
 
-.middle::before{
+.middle::after{
     content: '';
     display: block;
     position: absolute;
@@ -162,7 +171,7 @@ th, td {
     margin-top: 10%;
     margin-bottom: 10%;
     padding-top: 100%;
-    background-color: $booked;
+    background-color: var(--booking-color);
     z-index: 1;
 }
 
@@ -184,21 +193,24 @@ th, td {
 }
 
 // End pseudo-element
-.end::before {
+.end::after {
     content: '';
     display: block;
     position: absolute;
     top: 0;
     bottom: 0;
+    width: 30%;
     margin-top: 10%;
     margin-bottom: 10%;
+    padding-top: 100%;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    width: 30%;
-    background-color: $booked;
+    background-color: var(--booking-color);
     left: 0; // Position to the left
-    z-index: 1;
+    z-index: 3;
 }
+
+
 
 
 
@@ -265,18 +277,6 @@ th, td {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
   .color-legend {
     .legend-title {
         font-size: 1.25rem;
@@ -331,3 +331,10 @@ th, td {
         }
     }
 }
+
+
+// th, td {
+//     width: 100px; // Explicit width for all cells
+//     min-width: 100px; // Prevent columns from shrinking below this width
+
+// }

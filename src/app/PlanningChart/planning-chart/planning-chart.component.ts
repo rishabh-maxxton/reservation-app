@@ -80,6 +80,8 @@ export class PlanningChartComponent implements OnInit {
 }
 
 
+
+
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
       this.locations = [...new Set(data.map(room => room.locationName))];
