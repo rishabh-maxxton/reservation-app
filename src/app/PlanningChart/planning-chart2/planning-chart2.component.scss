@@ -127,7 +127,7 @@ th, td {
 // Start pseudo-element
 .start::before {
     content: '';
-    background-color: var(--booking-color);
+    background-color: var(--booking-color-start);
     display: block;
     position: absolute;
     top: 0;
@@ -138,9 +138,8 @@ th, td {
     padding-top: 100%;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    
     right: 0; // Position to the right
-    z-index: 3;
+    z-index: 1;
 }
 
 
@@ -157,7 +156,6 @@ th, td {
     padding-bottom: 3.75rem;
     // margin-top: 3px;
     overflow: hidden; // To ensure the pseudo-element is contained
-   
     // padding-top: 0rem;
 }
 
@@ -171,7 +169,7 @@ th, td {
     margin-top: 10%;
     margin-bottom: 10%;
     padding-top: 100%;
-    background-color: var(--booking-color);
+    background-color: var(--booking-color-middle);
     z-index: 1;
 }
 
@@ -205,7 +203,7 @@ th, td {
     padding-top: 100%;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-    background-color: var(--booking-color);
+    background-color: var(--booking-color-end);
     left: 0; // Position to the left
     z-index: 3;
 }

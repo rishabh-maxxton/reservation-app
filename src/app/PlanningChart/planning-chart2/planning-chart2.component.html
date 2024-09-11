@@ -64,7 +64,7 @@
                 <td scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</td>
                 <ng-container *ngFor="let day of dateArray">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
-                        [ngStyle]="{'--booking-color': getBookingStyle(getBookingStatus(room.roomId, day))}"
+                        [ngStyle]="getBookingStyle(room.roomId, day)"
                         [ngClass]="{
                             'cell': true,
                             'selected': selectedRoomId === room.roomId && selctedDateCompare(day),
@@ -91,6 +91,11 @@
 </div>
 
 
+<!-- [ngStyle]="{'--booking-color': getBookingStyle(getBookingStatus(room.roomId, day)),
+                        '--booking-color-start' : getBookingStyle(getBookingStatus(room.roomId, day)),
+                        '--booking-color-middle' : getBookingStyle(getBookingStatus(room.roomId, day)),
+                        '--booking-color-end' : getBookingStyle(getBookingStatus(room.roomId, day)),
+                    }" -->
 <!-- (mousedown)="startSelection(room.roomId, day)"
 (mouseover)="continueSelection(room.roomId, day)"
 (mouseup)="endSelection(room.roomId, day)"
