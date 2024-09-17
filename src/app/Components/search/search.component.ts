@@ -25,7 +25,7 @@ export class SearchComponent{
       priceRange: 4000,
       minDays: 0,
       maxDays: 0
-    });
+    }); 
   }
 
 

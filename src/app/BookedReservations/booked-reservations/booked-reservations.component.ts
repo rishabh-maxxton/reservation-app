@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { NewReservationModalComponent } from '../../NewReservationModal/new-reservation-modal/new-reservation-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-booked-reservations',
@@ -10,7 +12,7 @@ export class BookedReservationsComponent implements OnInit {
   bookings: any[] = []; // Array to hold booking data
   bookingForm: FormGroup; // Form group for handling updates
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.bookingForm = this.fb.group({
       reservationId: [''],
       status: ['']
@@ -53,6 +55,12 @@ export class BookedReservationsComponent implements OnInit {
     } else {
       alert('Booking not found!');
     }
+  }
+
+  openReservationModal(): void {
+    this.dialog.open(NewReservationModalComponent, {
+      width: '120rem'
+    });
   }
 
   paidanddue(index: number) {

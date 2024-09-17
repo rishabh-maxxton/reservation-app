@@ -7,8 +7,12 @@ export interface Room {
     guestCapacity: number;
     stayDateFrom?: string;
     stayDateTo?: string;
+    bookDateFrom?: string;
+    bookDateTo?: string;
     arrivalDays?: string[];
     departureDays?: string[];
+    minDeviation?: number;
+    maxDeviation?: number;
     minStay?: number;
     maxStay?: number;
   }
@@ -21,7 +25,11 @@ export interface StayDetails {
   arrivalDays: string[]; 
   departureDays: string[]; 
   minStay: number; 
-  maxStay: number; 
+  maxStay: number;
+  bookDateFrom: string;
+  bookDateTo: string;
+  minDeviation: number;
+  maxDeviation: number;
 }
 
 export interface RoomConstraint {

@@ -72,15 +72,12 @@ export class PlanningChartComponent implements OnInit {
         const endDateFormatted = `${booking.endDate}-${this.months[this.selectedMonth - 1]}-${this.selectedYear}`;
         
         // Return tooltip content with booking details
-        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted}`;
+        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted} \n No. of Guests : ${booking.totalGuests} \n status : ${booking.status}`;
     }
     
     // Return empty string if no booking is found for the day
     return '';
-}
-
-
-
+  }
 
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
@@ -92,6 +89,7 @@ export class PlanningChartComponent implements OnInit {
     this.roomService.loadAvailability().subscribe((data: any[]) => {
       this.availability = data;
       this.applyFilters();
+      console.log(this.availability);
       this.extractRoomConstraints1(); // Use the updated method
     });
 
@@ -215,7 +213,7 @@ export class PlanningChartComponent implements OnInit {
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ startDate: number, endDate: number, customerName: string }> {
+  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string, totalGuests: number }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
@@ -223,15 +221,83 @@ export class PlanningChartComponent implements OnInit {
              bookingStartDate.getMonth() === month - 1 &&
              bookingEndDate.getMonth() === month - 1;
     });
-
-    // console.log(roomBookings);
-
     return roomBookings.map(booking => ({
+      roomId: roomId,
       startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
       endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
       customerName: booking.customerInfo.name,
+      status: booking.bookingInfo.status,
+      totalGuests: booking.bookingInfo.totalGuests
     })).sort((a, b) => a.startDate - b.startDate);
-    
+  }
+
+  getBookingStatus(roomId: number, day: number): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => roomId === b.roomId && day >= b.startDate && day <= b.endDate);
+    return booking ? booking.status : 'Available'; 
+  }
+
+  getStartStatusColour(roomId: number, day: number): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => roomId === b.roomId && day == b.startDate);
+    return booking ? booking.status : 'Available'; 
+  }
+
+  getEndStatusColour(roomId: number, day: number): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => roomId === b.roomId && day == b.endDate);
+    return booking ? booking.status : 'Available'; 
+  }
+
+  getBookingStyle(roomId: number, day: number): {[key: string]: string} {
+    const status = this.getBookingStatus(roomId, day);
+    const color = this.getBookingColor(status);
+    const bookingClass = this.getBookingClass(roomId, day);
+    if(bookingClass == 'start-end'){
+      const statusStart = this.getStartStatusColour(roomId, day);
+      const statusEnd = this.getEndStatusColour(roomId, day);
+      const colorStart = this.getBookingColor(statusStart);
+      const colorEnd = this.getBookingColor(statusEnd);
+      return {
+        [`--booking-color-start`]: colorStart,
+        [`--booking-color-end`]: colorEnd,        
+      }
+    }
+    return {
+      [`--booking-color-${bookingClass}`]: color
+    };
+  }
+
+  getBookingColor(status: string): string {
+    switch (status) {
+      case 'Confirmed':
+        return '#f39c12';
+      case 'Checked In':
+        return '#3498db';
+      case 'Due In':
+        return '#9b59b6';
+      case 'Checked Out':
+        return '#2ecc71';
+      case 'Cancelled':
+        return '#e74c3c';
+      default:
+        return '#20bf6b';
+    }
+  }
+
+  getBookingClass(roomId: number, day: number): string {
+    if (this.isEndOfBooking(roomId, day) && this.isStartOfBooking(roomId, day)) {
+      return 'start-end';
+    }
+    if (this.isStartOfBooking(roomId, day)) {
+      return 'start';
+    } else if (this.isEndOfBooking(roomId, day)) {
+      return 'end';
+    } else if (this.isMiddleCell(roomId, day)) {
+      return 'middle';
+    } else {
+      return ''; 
+    }
   }
 
   isDayBooked(roomId: number, day: number): boolean {

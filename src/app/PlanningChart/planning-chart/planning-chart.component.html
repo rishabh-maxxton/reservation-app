@@ -67,6 +67,7 @@
                 <th scope="row" class="room-info"><i class="fas fa-bed"></i> {{ room.roomId }}.{{ room.roomName }}</th>
                 <ng-container *ngFor="let day of days">
                     <td *ngIf="!isPartOfBookedRange(room.roomId, day)"
+                        [ngStyle]="getBookingStyle(room.roomId, day)"
                         [ngClass]="{
                             'cell': true,
                             'start': isStartOfBooking(room.roomId, day),

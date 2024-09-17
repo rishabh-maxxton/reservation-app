@@ -16,7 +16,7 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 export class PlanningChart2Component implements OnInit{
   rooms:  Room[] = [];
   startDate: Date = new Date();
-  endDate: Date = new Date('2025-01-31');
+  endDate: Date = new Date('2024-11-30');
   filteredRooms: Room[] = [];
   days: number[] = [];
   locations: string[] = [];
@@ -92,10 +92,13 @@ export class PlanningChart2Component implements OnInit{
 
   generateDateArray(startDate: Date, endDate: Date): Date[] {
     const dates: Date[] = [];
+    // console.log(dates);
     const currentDate = new Date(startDate);
+    currentDate.setHours(5, 30, 0, 0);
     while (currentDate <= new Date(endDate)) {
       dates.push(new Date(currentDate))
       currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.setHours(5, 30, 0, 0);
     }
     return dates;
   }
@@ -117,14 +120,15 @@ export class PlanningChart2Component implements OnInit{
   }
 
   getTooltipContent(roomId: number, day: Date): string {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
-    
-    const booking = bookings.find(b => day.getDate() >= b.startDate && day.getDate() <= b.endDate);
+    const bookings = this.getAllBookings(roomId);
+    // const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
+    const dayStr = day.toISOString().split('T')[0];
+    const booking = bookings.find(b => dayStr >= b.startDate.toISOString().split('T')[0] && dayStr <= b.endDate.toISOString().split('T')[0]);
 
     if (booking) {
         const startDateFormatted = `${booking.startDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
         const endDateFormatted = `${booking.endDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
-        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted} \n status: ${booking.status}`;
+        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted} \n No. of Guests : ${booking.totalGuests} \n status : ${booking.status}`;
     }
     return '';
   }
@@ -195,7 +199,7 @@ export class PlanningChart2Component implements OnInit{
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string }> {
+  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string, totalGuests: number }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
@@ -208,25 +212,52 @@ export class PlanningChart2Component implements OnInit{
       startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
       endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
       customerName: booking.customerInfo.name,
-      status: booking.bookingInfo.status
+      status: booking.bookingInfo.status,
+      totalGuests: booking.bookingInfo.totalGuests
     })).sort((a, b) => a.startDate - b.startDate);
   }
 
+  getAllBookings(roomId: number): Array<{ roomId: number, startDate: Date, endDate: Date, customerName: string, status: string, totalGuests: number }> {
+    const roomBookings = this.bookings.filter(booking => {
+      const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
+      const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
+      // console.log(bookingStartDate);
+      return booking.bookingInfo.roomNo === roomId
+    });
+    
+    return roomBookings.map(booking => ({
+      roomId: roomId,
+      startDate: new Date(booking.bookingInfo.stayDateFrom),
+      endDate: new Date(booking.bookingInfo.stayDateTo),
+      customerName: booking.customerInfo.name,
+      status: booking.bookingInfo.status,
+      totalGuests: booking.bookingInfo.totalGuests
+    }))
+    .sort((a, b) => a.startDate.getDate() - b.startDate.getDate());
+  }
+
   getBookingStatus(roomId: number, day: Date): string {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
-    const booking = bookings.find(b => roomId === b.roomId && day.getDate() >= b.startDate && day.getDate() <= b.endDate);
+    // const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
+    const bookings = this.getAllBookings(roomId);
+    const dayStr = day.toISOString().split('T')[0];
+    const booking = bookings.find(b => roomId === b.roomId && dayStr >= b.startDate.toISOString().split('T')[0] && dayStr <= b.endDate.toISOString().split('T')[0]);
     return booking ? booking.status : 'Available'; 
   }
 
   getStartStatusColour(roomId: number, day: Date): string {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
-    const booking = bookings.find(b => roomId === b.roomId && day.getDate() == b.startDate);
+    // const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
+    const bookings = this.getAllBookings(roomId);
+    const dayStr = day.toISOString().split('T')[0];
+    const booking = bookings.find(b => roomId === b.roomId && dayStr == b.startDate.toISOString().split('T')[0]);
     return booking ? booking.status : 'Available'; 
   }
 
   getEndStatusColour(roomId: number, day: Date): string {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
-    const booking = bookings.find(b => roomId === b.roomId && day.getDate() == b.endDate);
+    const bookings = this.getAllBookings(roomId);
+    // const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth() + 1);
+    const dayStr = day.toISOString().split('T')[0];
+    const booking = bookings.find(b => roomId === b.roomId && dayStr == b.endDate.toISOString().split('T')[0]);
+    // console.log(booking?.status);
     return booking ? booking.status : 'Available'; 
   }
 
@@ -281,25 +312,44 @@ export class PlanningChart2Component implements OnInit{
     }
   }
 
-  isDayBooked(roomId: number, day: number): boolean {
-    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
-    return bookings.some(booking => day >= booking.startDate && day < booking.endDate);
-  }
+  // isDayBooked(roomId: number, day: number): boolean {
+  //   const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+  //   return bookings.some(booking => day >= booking.startDate && day < booking.endDate);
+  // }
 
   isStartOfBooking(roomId: number, day: Date): boolean {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth()+1);
-    return bookings.some(booking => roomId === roomId && booking.startDate === day.getDate());
+    const bookings = this.getAllBookings(roomId);
+    const dayStr = day.toISOString().split('T')[0];
+
+    for (const booking of bookings) {
+      const startDateStr = booking.startDate.toISOString().split('T')[0];
+      if (roomId === booking.roomId && dayStr === startDateStr) {
+          return true;
+      }
+    }
+    return false;
   }
 
   isEndOfBooking(roomId: number, day: Date): boolean {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth()+1);
-    return bookings.some(booking => roomId === roomId && booking.endDate === day.getDate());
+    const bookings = this.getAllBookings(roomId);
+    const dayStr = day.toISOString().split('T')[0];
+
+    for (const booking of bookings) {
+        const endDateStr = booking.endDate.toISOString().split('T')[0];
+        if (roomId === booking.roomId && dayStr === endDateStr) {
+            return true;
+        }
+    }
+    return false;
   }
 
   isMiddleCell(roomId: number, day: Date): boolean {
-    const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth()+1);
+    // const bookings = this.getRoomBookingsForMonth(roomId, day.getMonth()+1);
+    const bookings = this.getAllBookings(roomId);
     for (const booking of bookings) {
-        if (roomId === roomId && day.getDate() > booking.startDate && day.getDate() < booking.endDate) {
+        // console.log(day, booking.endDate, booking.startDate)
+        // if (roomId === roomId && day.getDate() > booking.startDate && day.getDate() < booking.endDate) {
+        if (roomId === roomId && day > booking.startDate && day < booking.endDate) {
             return true;
         }
     }
@@ -439,6 +489,9 @@ export class PlanningChart2Component implements OnInit{
   }
 
   startSelection(roomId: number, day: Date) {
+    console.log(this.getAllBookings(1));
+    console.log(day);
+    console.log(this.isEndOfBooking(1, day))
     if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day) || this.isDateBeforeToday(day)) return;
     console.log(new Date(day.getFullYear(), day.getMonth(), day.getDate()));
     this.isSelecting = true;
@@ -448,6 +501,7 @@ export class PlanningChart2Component implements OnInit{
     this.extractRoomConstraints1();
     this.highlightDepartureDays(roomId, day);
   }
+
 
   formatDateToString(date: Date): string {
     // Format date as YYYY-MM-DD

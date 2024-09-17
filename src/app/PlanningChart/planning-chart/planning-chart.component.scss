@@ -169,7 +169,7 @@ th, td {
     padding-top: 100%;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    background-color: $booked;
+    background-color: var(--booking-color-start);
     right: 0; // Position to the right
     z-index: 1;
 }
@@ -210,7 +210,7 @@ th, td {
     margin-top: 10%;
     margin-bottom: 10%;
     padding-top: 100%;
-    background-color: $booked;
+    background-color: var(--booking-color-middle);
     z-index: 1;
 }
 
@@ -245,7 +245,7 @@ th, td {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     width: 30%;
-    background-color: $booked;
+    background-color: var(--booking-color-end);
     left: 0; // Position to the left
     z-index: 1;
 }
