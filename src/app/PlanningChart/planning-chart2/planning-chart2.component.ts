@@ -680,6 +680,7 @@ export class PlanningChart2Component implements OnInit{
     // const day = date.getDate();
     const start = constraints[this.getWeekday(date)];
     console.log(start); 
+    this.roomService.setFilterDates(stayDateFrom, stayDateTo);
     this.router.navigate(['/form'], {
       state: {
         room: {

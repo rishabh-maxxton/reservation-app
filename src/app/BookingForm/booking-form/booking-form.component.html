@@ -239,7 +239,7 @@
   </mat-step>
   <mat-step >
     <ng-template matStepLabel>Preview</ng-template>
-    <div  class="current-bookings">
+    <div  class="current-bookings" #preview>
       <h2>Preview</h2>
       <div *ngIf="currentBooking.length > 0; else noBookings">
         <div *ngFor="let booking of currentBooking" class="booking-details">
@@ -274,7 +274,9 @@
       <ng-template #noBookings>
         <p>No bookings available.</p>
       </ng-template>
+      <button class="download" (click)="downloadPreview()">Download</button>
     </div>
+    
     
   </mat-step>
 </mat-stepper>

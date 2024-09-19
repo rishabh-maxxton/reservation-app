@@ -376,10 +376,10 @@ isMiddleCell(roomId: number, day: number): boolean {
     const constraints = this.roomConstraints1[roomId] || [];
     const date = new Date(this.selectedYear, this.selectedMonth - 1, day);
     const dayOfWeekString = this.getDayOfWeekString(date.getDay());
-
+    
     return constraints.some(constraint => 
       constraint.arrivalDays.includes(dayOfWeekString) &&
-      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day)
+      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMiddleCell(roomId, day)
     );
   }
 
@@ -484,10 +484,8 @@ isMiddleCell(roomId: number, day: number): boolean {
     this.highlightedDays[roomId] = daysToHighlight;
   }
   
-
   startSelection(roomId: number, day: number) {
     if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;
-    
     this.isSelecting = true;
     this.selectedRoomId = roomId;
     this.selectedDates = [day];
@@ -496,9 +494,6 @@ isMiddleCell(roomId: number, day: number): boolean {
     this.highlightDepartureDays(roomId, day);
   }
   
-
- 
-
   continueSelection(roomId: number, day: number) {
     if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;
   
@@ -567,6 +562,7 @@ isMiddleCell(roomId: number, day: number): boolean {
       this.isSelecting = false;
       this.bookRoom(this.selectedRoomId, this.formatDate(this.selectedDates[0]), this.formatDate(this.selectedDates[this.selectedDates.length - 1]));
       this.applySelectionConstraints(roomId, day);
+      this.highlightedDays[roomId] = [];
       return;
     }
 
@@ -594,6 +590,7 @@ isMiddleCell(roomId: number, day: number): boolean {
       this.selectedRoomId = 0;
       this.highlightedDays[roomId] = [];
     }
+    this.highlightedDays[roomId] = [];
   }
   
 
@@ -606,6 +603,7 @@ isMiddleCell(roomId: number, day: number): boolean {
         let lastDate = this.selectedDates[this.selectedDates.length - 1];
         if(this.isEndOfBooking(roomId, lastDate+1) || this.isMiddleCell(roomId, lastDate+1)){
           this.selectedRoomId = 0;
+          this.highlightedDays[roomId] = [];
         }
         // console.log(this.isDayBooked(roomId, lastDate+1));
         if (lastDate < this.days.length && !this.isEndOfBooking(roomId, lastDate+1) && !this.isMiddleCell(roomId, lastDate+1) && this.isDayAvailable(roomId, lastDate+1)) {
@@ -662,6 +660,7 @@ isMiddleCell(roomId: number, day: number): boolean {
     const day = date.getDate();
     const start = constraints[this.getWeekday(day)];
     console.log(start); 
+    this.roomService.setFilterDates(stayDateFrom, stayDateTo);
     this.router.navigate(['/form'], {
       state: {
         room: {

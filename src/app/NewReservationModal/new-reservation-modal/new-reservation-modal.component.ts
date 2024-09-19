@@ -4,6 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room } from '../../Interface/room-interface';
+import moment from 'moment';
 
 @Component({
   selector: 'app-new-reservation-modal',
@@ -40,11 +41,16 @@ export class NewReservationModalComponent implements OnInit {
    
     this.roomService.getRooms().subscribe((data: Room[]) => {
       this.rooms = data;
-      this.filteredRooms = data;
+      // this.filteredRooms = data;
       // this.calculateDateConstraints();
     });
    
-    this.reservationForm.valueChanges.subscribe(() => this.onFilter());
+    this.reservationForm.valueChanges.subscribe(() => {
+      this.onFilter();
+
+      this.roomService.setFilterDates(this.reservationForm.get('arrivalDate')?.value.toISOString().split('T')[0], this.reservationForm.get('departureDate')?.value.toISOString().split('T')[0]);
+    });
+    // this.reservationForm.valueChanges.subscribe(() => this.roomService.setFilterDates(this.reservationForm.get('arrivalDate')?.value, this.reservationForm.get('departureDate')?.value));
   }
 
   //   generateArrivalDates(room: Room): Set<string> {
@@ -67,8 +73,8 @@ export class NewReservationModalComponent implements OnInit {
     if (!room.minDeviation || !room.maxDeviation || !room.bookDateFrom || !room.bookDateTo || !room.arrivalDays) return arrivalDates;
   
     const today = new Date();
-    const bookDateFrom = new Date(room.bookDateFrom);
-    const bookDateTo = new Date(room.bookDateTo);
+    const bookDateFrom = new Date(room.bookDateFrom || " ");
+    const bookDateTo = new Date(room.bookDateTo || " ");
   
     // Check if today is within the booking range
     if (today < bookDateFrom || today > bookDateTo) {
@@ -76,7 +82,7 @@ export class NewReservationModalComponent implements OnInit {
     }
   
     // Calculate min and max dates based on deviation
-    const minDate = new Date(today.getTime() + (room.minDeviation * 24 * 60 * 60 * 1000)); // minDeviation days from today
+    const minDate = new Date(today.getTime() + (room.minDeviation || 0 * 24 * 60 * 60 * 1000)); // minDeviation days from today
     const maxDate = new Date(today.getTime() + (room.maxDeviation * 24 * 60 * 60 * 1000)); // maxDeviation days from today
   
     // Ensure the deviation dates fall within the booking range
@@ -92,7 +98,8 @@ export class NewReservationModalComponent implements OnInit {
     // Add dates from effectiveMinDate to effectiveMaxDate to the set, checking arrivalDays
     for (let date = minDate; date <= maxDate; date.setDate(date.getDate() + 1)) {
       const dayOfWeek = getDayOfWeek(date);
-      if (room.arrivalDays.includes(dayOfWeek)) {
+      let arrivals = room.arrivalDays || [];
+      if (arrivals.includes(dayOfWeek)) {
         arrivalDates.add(date.toISOString().split('T')[0]); // Format as yyyy-mm-dd
       }
     }
@@ -219,7 +226,45 @@ export class NewReservationModalComponent implements OnInit {
     //   // If form values are not valid, show all rooms
     //   this.filteredRooms = this.rooms;
     // }
+    this.filterOutBookedRooms();
   }
+
+  filterOutBookedRooms(): void {
+    console.log("Heyy");
+    const bookings = this.getBookingsFromLocalStorage();
+    console.log(bookings);
+
+    this.filteredRooms = this.filteredRooms.filter(room => {
+      return !bookings.some(booking => 
+        booking.bookingInfo.roomNo === room.roomId && this.isDateOverlap(booking.bookingInfo.stayDateFrom, booking.bookingInfo.stayDateTo, this.reservationForm.value.arrivalDate, this.reservationForm.value.departureDate)
+      );
+    });
+    console.log(this.filteredRooms);
+  }
+
+  getBookingsFromLocalStorage(): any[] {
+    const bookings = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('booking_')) {
+        const booking = JSON.parse(localStorage.getItem(key) || '{}');
+        // console.log('Booking Start:', new Date(booking.bookingInfo.stayDateFrom));
+        // console.log('Booking End:', new Date(booking.bookingInfo.stayDateTo));
+        // console.log('Form Start:', new Date(this.formData.startDate));
+        // console.log('Form End:', new Date(this.formData.endDate));
+        // console.log(booking.bookingInfo.stayDateFrom)
+        bookings.push(booking);
+      }
+    }
+    return bookings;
+  }
+
+  isDateOverlap(start1: any, end1: any, start2: any, end2: any): boolean {
+    console.log(start1, end1, start2, end2);
+    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]');
+    // return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
+  }
+
   
 
   // onFilter() {

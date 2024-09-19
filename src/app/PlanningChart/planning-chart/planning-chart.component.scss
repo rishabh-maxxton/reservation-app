@@ -69,6 +69,29 @@ $departureDay: rgb(235, 106, 235);
             .arrival-day-on-hover {
                 background-color: $arivalDayHover; 
             }
+            .new{
+                background-color: #20bf6b;
+              }
+            
+              .confirmed{
+                background-color: #f39c12;
+              }
+            
+              .checkedIn{
+                background-color: #3498db;
+              }
+              
+              .checkedOut{
+                background-color: #2ecc71;
+              }
+            
+              .cancelled{
+                background-color: #e74c3c;
+              }
+            
+              .dueIn{
+                background-color: #9b59b6;
+              }
         }
     }
 }

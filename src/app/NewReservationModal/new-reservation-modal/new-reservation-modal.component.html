@@ -65,7 +65,8 @@
       <ng-container matColumnDef="bookNow">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let room">
-          <button mat-button (click)="bookNow(room)">Book Now</button>
+          <button mat-button (click)="onClose()" routerLink="/form" [state]="{ room: room}" >Book Now</button>
+          <!-- <button mat-button (click)="bookNow(room)" >Book Now</button> -->
         </td>
       </ng-container>
 

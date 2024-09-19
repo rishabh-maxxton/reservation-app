@@ -38,12 +38,12 @@
             <td>{{ booking.payment.dueAmount }}</td>
             <td>
               <select [(ngModel)]="booking.status" class="form-select status-dropdown" (change)="updateStatus(i, booking.status)">
-                <option value="New" class="text-dark">New</option>
-                <option value="Confirmed" class="text-dark">Confirmed</option>
-                <option value="Checked In" class="text-dark">Checked In</option>
-                <option value="Due In" class="text-dark">Due In</option>
-                <option value="Checked Out" class="text-dark">Checked Out</option>
-                <option value="Cancelled" class="text-dark">Cancelled</option>
+                <option value="New" class="new text-dark">New</option>
+                <option value="Confirmed" class="confirmed text-dark">Confirmed</option>
+                <option value="Checked In" class="checkedIn text-dark">Checked In</option>
+                <option value="Due In" class="dueIn text-dark">Due In</option>
+                <option value="Checked Out" class="checkedOut text-dark">Checked Out</option>
+                <option value="Cancelled" class="cancelled text-dark">Cancelled</option>
               </select>
             </td>
           </tr>

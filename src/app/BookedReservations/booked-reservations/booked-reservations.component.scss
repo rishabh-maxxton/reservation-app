@@ -107,29 +107,6 @@
   }
   
   /* Custom classes for status */
-  .bg-warning {
-    background-color: #ffc107 !important;
-  }
-  
-  .bg-info {
-    background-color: #17a2b8 !important;
-  }
-  
-  .bg-success {
-    background-color: #28a745 !important;
-  }
-  
-  .bg-light {
-    background-color: #f8f9fa !important;
-  }
-  
-  .bg-secondary {
-    background-color: #6c757d !important;
-  }
-  
-  .bg-danger {
-    background-color: #dc3545 !important;
-  }
   
   .text-dark {
     color: #343a40 !important;
@@ -138,4 +115,40 @@
   .text-white {
     color: #ffffff !important;
   }
+
+  .new{
+    background-color: #20bf6b;
+  }
+
+  .confirmed{
+    background-color: #f39c12;
+  }
+
+  .checkedIn{
+    background-color: #3498db;
+  }
   
+  .checkedOut{
+    background-color: #2ecc71;
+  }
+
+  .cancelled{
+    background-color: #e74c3c;
+  }
+
+  .dueIn{
+    background-color: #9b59b6;
+  }
+
+  // case 'Confirmed':
+  //       return '#f39c12';
+  //     case 'Checked In':
+  //       return '#3498db';
+  //     case 'Due In':
+  //       return '#9b59b6';
+  //     case 'Checked Out':
+  //       return '#2ecc71';
+  //     case 'Cancelled':
+  //       return '#e74c3c';
+  //     default:
+  //       return '#20bf6b';

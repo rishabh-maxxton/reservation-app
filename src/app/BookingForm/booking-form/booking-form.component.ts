@@ -1,8 +1,10 @@
-  import { Component, OnInit } from '@angular/core';
+  import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
   import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
   import { MatSnackBar } from '@angular/material/snack-bar';
   import moment from 'moment';
   import { RoomServiceService } from '../../Service/room-service.service';
+  import jsPDF from 'jspdf';
+  import html2canvas from 'html2canvas';
 
   @Component({
     selector: 'app-booking-form',
@@ -10,6 +12,7 @@
     styleUrls: ['./booking-form.component.scss']
   })
   export class BookingFormComponent implements OnInit {
+    @ViewChild('preview', { static: false }) previewElement!: ElementRef;
     userTypeFormGroup: FormGroup;
     bookingForm: FormGroup;
     customerForm: FormGroup;
@@ -62,8 +65,10 @@
       if (roomData) {
         this.bookingForm.patchValue({
           roomNo: roomData.roomId,
-          stayDateFrom: roomData.stayDateFrom,
-          stayDateTo: roomData.stayDateTo,
+          // stayDateFrom: roomData.stayDateFrom,
+          // stayDateTo: roomData.stayDateTo,
+          stayDateFrom: stayDateFrom1,
+          stayDateTo: stayDateTo,
           pricePerDayPerPerson: roomData.pricePerDayPerPerson,
           numberOfDays: this.UpdateNoOfDays()
         });
@@ -122,7 +127,42 @@
       this.UpdateNoOfDays();
     }
 
-   
+    downloadPreview() {
+      if (this.previewElement) {
+        const data = this.previewElement.nativeElement;
+    
+        html2canvas(data).then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF();
+    
+          // Calculate width and height for the image in the PDF
+          const imgWidth = pdf.internal.pageSize.getWidth();
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+          // Check if the image height exceeds the page height
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          let heightLeft = imgHeight;
+    
+          let position = 0;
+    
+          // Add the image to the PDF, page by page if necessary
+          while (heightLeft >= 0) {
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            position -= pageHeight; // Move down for the next page
+    
+            // If there's still content, add a new page
+            if (heightLeft >= 0) {
+              pdf.addPage();
+            }
+          }
+    
+          pdf.save('preview.pdf');
+        });
+      } else {
+        console.error('Preview element not found');
+      }
+    }
     
 
     guestCapacityValidator(control: AbstractControl): ValidationErrors | null {
