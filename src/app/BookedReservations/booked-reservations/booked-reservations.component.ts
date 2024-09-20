@@ -11,6 +11,9 @@ import { MatDialog } from '@angular/material/dialog';
 export class BookedReservationsComponent implements OnInit {
   bookings: any[] = []; // Array to hold booking data
   bookingForm: FormGroup; // Form group for handling updates
+  chartData: number[] = [];
+  chartLabels: string[] = [];
+  
 
   constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.bookingForm = this.fb.group({
@@ -21,6 +24,7 @@ export class BookedReservationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBookings();
+    this.prepareChartData();
   }
 
   loadBookings() {
@@ -34,11 +38,31 @@ export class BookedReservationsComponent implements OnInit {
           this.bookings.push({
             ...bookingData.bookingInfo,
             payment: bookingData.paymentInfo,
-            customer: bookingData.customerInfo
+            customer: bookingData.customerInfo,
+            // status: bookingData.bookingInfo.status as BookingStatus
           });
         }
       }
     }
+  }
+
+
+  prepareChartData() {
+    let statusCounts: any = {
+      "New": 0,
+      "Confirmed": 0,
+      "Checked In": 0,
+      "Due In": 0,
+      "Checked Out": 0,
+      "Cancelled": 0,
+    };
+
+    this.bookings.forEach(booking => {
+      statusCounts[booking.status]++;
+    });
+
+    this.chartLabels = Object.keys(statusCounts);
+    this.chartData = Object.values(statusCounts);
   }
 
   updateStatus(index: number, status: string) {

@@ -1,3 +1,4 @@
+
 <h1 class="heading">Planning Chart</h1>
 <div class="container-fluid">
     <div class="row">
@@ -37,12 +38,6 @@
                 <li><span class="color-box cancelled"></span>Cancelled</li>
             </ul>
         </div>
-        <!-- <div *ngIf="selectedDates.length > 0 && selectedRoomId" class="text-center mt-3">
-            <button  class="btn button " 
-            (click)="bookRoom(selectedRoomId, formatDate(selectedDates[0]), formatDate(selectedDates[selectedDates.length - 1]))">
-            <i class="fa-solid fa-plus"></i> Create Reservation
-            </button>
-        </div> -->
     </div>
 
 
@@ -85,38 +80,22 @@
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"
                         (mouseup)="endSelection(room.roomId, day)"
-                        matTooltip="{{ getTooltipContent(room.roomId, day) }}"
-                        matTooltipPosition="below">
+                        data-toggle="tooltip" 
+                        data-placement="bottom" 
+                        [attr.title]="getTooltipContent(room.roomId, day)"
+                        >
                     </td>
                 </ng-container>
             </tr>
         </tbody>
     </table>
 </div>
-</div>
+</div> 
 
 
-<!-- 'selected': selectedRoomId === room.roomId && selctedDateCompare(day), -->
 
 
-<!-- [ngStyle]="{'--booking-color': getBookingStyle(getBookingStatus(room.roomId, day)),
-                        '--booking-color-start' : getBookingStyle(getBookingStatus(room.roomId, day)),
-                        '--booking-color-middle' : getBookingStyle(getBookingStatus(room.roomId, day)),
-                        '--booking-color-end' : getBookingStyle(getBookingStatus(room.roomId, day)),
-                    }" -->
-<!-- (mousedown)="startSelection(room.roomId, day)"
-(mouseover)="continueSelection(room.roomId, day)"
-(mouseup)="endSelection(room.roomId, day)"
-matTooltip="{{ getTooltipContent(room.roomId, day) }}"
-matTooltipPosition="below" -->
 
-
-<!-- 'start': isStartOfBooking(room.roomId, day),
-'end': isEndOfBooking(room.roomId, day),
-'middle': isMiddleCell(room.roomId, day),
-'selected': selectedRoomId === room.roomId && selectedDates.includes(day),
-'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
-'unavailable': !isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
-'arrival-day': isArrivalDay(room.roomId, day),
-'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day) -->
-
+<!-- [matTooltip]="getTooltipContent(room.roomId, day)"
+                        [matTooltipClass]="'custom-tooltip'"
+                        matTooltipPosition="below" -->

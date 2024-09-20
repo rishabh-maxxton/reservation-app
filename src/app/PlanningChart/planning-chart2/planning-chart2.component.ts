@@ -1,12 +1,11 @@
-import { Component, OnInit  } from '@angular/core';
+import { AfterViewInit, Component, OnInit  } from '@angular/core';
 import { RoomServiceService } from '../../Service/room-service.service';
 import { Room, StayDetails, RoomConstraint } from '../../Interface/room-interface';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import moment from 'moment';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { Conditional } from '@angular/compiler';
+
 
 
 @Component({
@@ -45,8 +44,7 @@ export class PlanningChart2Component implements OnInit{
     private roomService: RoomServiceService,
     private router: Router,
     private datePipe: DatePipe,
-    private snackBar: MatSnackBar,
-    private sanitizer: DomSanitizer
+    private snackBar: MatSnackBar
   ) {
     const today = new Date();
     this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -127,12 +125,14 @@ export class PlanningChart2Component implements OnInit{
     const booking = bookings.find(b => dayStr >= b.startDate.toISOString().split('T')[0] && dayStr <= b.endDate.toISOString().split('T')[0]);
 
     if (booking) {
-        const startDateFormatted = `${booking.startDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
-        const endDateFormatted = `${booking.endDate}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
-        return `Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \n To: ${endDateFormatted} \n No. of Guests : ${booking.totalGuests} \n status : ${booking.status}`;
+        const startDateFormatted = `${booking.startDate.getDate()}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
+        const endDateFormatted = `${booking.endDate.getDate()}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
+        // return `Booked by: ${booking.customerName} \n From: ${startDateFormatted} \n To: ${endDateFormatted} \n No. of Guests : ${booking.totalGuests} \n status : ${booking.status}`;
+        return ` Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \nTo: ${endDateFormatted} \nNo. of Guests: ${booking.totalGuests} \nStatus: ${booking.status}`;
     }
     return '';
   }
+
 
   getRoomConstraints(roomId: number): { [key: string]: { minStay: number, maxStay: number, departureDays: string[] } } {
     const constraints = this.roomConstraints1[roomId] || [];
@@ -153,7 +153,7 @@ export class PlanningChart2Component implements OnInit{
         } else {
           constraintMap[day].minStay = Math.min(constraintMap[day].minStay, constraint.minStay);
           constraintMap[day].maxStay = Math.max(constraintMap[day].maxStay, constraint.maxStay);
-          console.log(constraintMap[day].maxStay);
+          // console.log(constraintMap[day].maxStay);
           const allDepartureDays = new Set([...constraintMap[day].departureDays, ...constraint.departureDays]);
           constraintMap[day].departureDays = Array.from(allDepartureDays);
         }

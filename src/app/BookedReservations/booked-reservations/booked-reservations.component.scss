@@ -124,6 +124,7 @@
     background-color: #f39c12;
   }
 
+
   .checkedIn{
     background-color: #3498db;
   }
@@ -139,6 +140,13 @@
   .dueIn{
     background-color: #9b59b6;
   }
+
+  .chart-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
 
   // case 'Confirmed':
   //       return '#f39c12';

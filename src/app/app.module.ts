@@ -69,6 +69,7 @@ import { MatTableModule } from '@angular/material/table';
     MatFormFieldModule,
     MatTableModule,
     MatNativeDateModule,
+    
   ],
   providers: [provideHttpClient(), provideAnimationsAsync(), DatePipe],
   bootstrap: [AppComponent]
