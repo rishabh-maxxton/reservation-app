@@ -15,12 +15,15 @@ export class RoomServiceService {
 
   public filterDates = {
     stayDateFrom : "",
-    stayDateTo : ""
+    stayDateTo : "",
+    numberOfPerson: 0,
   }
 
-  setFilterDates(stayDateFrom: string, stayDateTo : string){
+
+  setFilterDates(stayDateFrom: string, stayDateTo : string, numberOfPerson: number){
     this.filterDates.stayDateFrom = stayDateFrom;
     this.filterDates.stayDateTo = stayDateTo;
+    this.filterDates.numberOfPerson = numberOfPerson;
   }
 
   getFilterDates(){

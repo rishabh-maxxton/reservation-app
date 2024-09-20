@@ -32,7 +32,7 @@ export class SearchComponent{
   onSubmit(): void {
     this.Data.emit(this.filterForm);
     console.log(this.filterForm.get('startDate')?.value)
-    this.roomService.setFilterDates(this.filterForm.get('startDate')?.value, this.filterForm.get('endDate')?.value);
+    this.roomService.setFilterDates(this.filterForm.get('startDate')?.value, this.filterForm.get('endDate')?.value, this.filterForm.get('numberOfPersons')?.value);
   }
 }
 

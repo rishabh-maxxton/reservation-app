@@ -45,7 +45,7 @@ export class NewReservationModalComponent implements OnInit {
    
     this.reservationForm.valueChanges.subscribe(() => {
       this.onFilter();
-      this.roomService.setFilterDates(this.formatDate(this.reservationForm.get('arrivalDate')?.value), this.formatDate(this.reservationForm.get('departureDate')?.value));
+      this.roomService.setFilterDates(this.formatDate(this.reservationForm.get('arrivalDate')?.value), this.formatDate(this.reservationForm.get('departureDate')?.value), this.reservationForm.get('numberOfGuests')?.value);
     });
     // this.reservationForm.valueChanges.subscribe(() => this.roomService.setFilterDates(this.reservationForm.get('arrivalDate')?.value, this.reservationForm.get('departureDate')?.value));
   }

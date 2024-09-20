@@ -61,6 +61,7 @@
 
       let stayDateFrom1 = roomService.getFilterDates().stayDateFrom;
       let stayDateTo = roomService.getFilterDates().stayDateTo;
+      let numberOfPerson = roomService.getFilterDates().numberOfPerson;
 
       if (roomData) {
         this.bookingForm.patchValue({
@@ -69,6 +70,7 @@
           // stayDateTo: roomData.stayDateTo,
           stayDateFrom: stayDateFrom1,
           stayDateTo: stayDateTo,
+          totalGuests: numberOfPerson,
           pricePerDayPerPerson: roomData.pricePerDayPerPerson,
           numberOfDays: this.UpdateNoOfDays()
         });
@@ -120,11 +122,8 @@
     }
 
     ngOnInit(): void {
-      // console.log(this.bookingForm); 
-      // console.log(this.bookingForm.get('roomNo')?.value); 
-      // console.log(this.mini);
-      // console.log(this.maxi);
       this.UpdateNoOfDays();
+      this.updateTotalPrice();
     }
 
     downloadPreview() {
@@ -355,7 +354,7 @@
     }
     
     updateTotalPrice() {
-      const totalGuests = this.bookingForm.get('totalGuests')?.value || 0;
+      const totalGuests = this.bookingForm.get('totalGuests')?.value || this.roomService.getFilterDates().numberOfPerson || 0;
       const pricePerDayPerPerson = this.bookingForm.get('pricePerDayPerPerson')?.value || 0;
       const numberOfDays = this.bookingForm.get('numberOfDays')?.value || 0;
       const totalPrice = totalGuests * pricePerDayPerPerson * numberOfDays;

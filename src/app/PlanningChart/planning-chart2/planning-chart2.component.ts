@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import moment from 'moment';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+import { Conditional } from '@angular/compiler';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 export class PlanningChart2Component implements OnInit{
   rooms:  Room[] = [];
   startDate: Date = new Date();
-  endDate: Date = new Date('2024-11-30');
+  endDate: Date = new Date('2024-10-30');
   filteredRooms: Room[] = [];
   days: number[] = [];
   locations: string[] = [];
@@ -105,10 +106,10 @@ export class PlanningChart2Component implements OnInit{
 
   updateDateArrayAndRange(): void {
     this.dateArray = this.generateDateArray(this.startDate, this.endDate);
-    console.log(this.dateArray);
-    console.log(this.startDate, this.endDate);
+    // console.log(this.dateArray);
+    // console.log(this.startDate, this.endDate);
     this.generateDateRange();
-    console.log(this.dateRange);
+    // console.log(this.dateRange);
   }
 
   onStartDateChange(): void {
@@ -135,7 +136,6 @@ export class PlanningChart2Component implements OnInit{
 
   getRoomConstraints(roomId: number): { [key: string]: { minStay: number, maxStay: number, departureDays: string[] } } {
     const constraints = this.roomConstraints1[roomId] || [];
-  
     if (!constraints) {
       return {};
     }
@@ -153,13 +153,13 @@ export class PlanningChart2Component implements OnInit{
         } else {
           constraintMap[day].minStay = Math.min(constraintMap[day].minStay, constraint.minStay);
           constraintMap[day].maxStay = Math.max(constraintMap[day].maxStay, constraint.maxStay);
+          console.log(constraintMap[day].maxStay);
           const allDepartureDays = new Set([...constraintMap[day].departureDays, ...constraint.departureDays]);
           constraintMap[day].departureDays = Array.from(allDepartureDays);
         }
       });
     });
-    console.log(constraintMap);
-    return constraintMap; // Ensure this returns an array with a single object
+    return constraintMap;
   }
 
   formatDate(date: Date): string {
@@ -467,9 +467,9 @@ export class PlanningChart2Component implements OnInit{
   }
 
   getDepartureDaysForRange(roomId: number, startDay: Date, departureDays: string[], maxStay: number): Date[] {
-    console.log('Departure Days:', departureDays);
+    // console.log('Departure Days:', departureDays);
     const daysInMonth = new Date(startDay.getFullYear(), startDay.getMonth(), 0).getDate();
-    console.log('Days in Month:', daysInMonth);
+    // console.log('Days in Month:', daysInMonth);
     const validDepartureDays: Date[] = [];
 
     for (let i = 0; i < maxStay; i++) {
@@ -484,9 +484,9 @@ export class PlanningChart2Component implements OnInit{
       }
     }
 
-    console.log('Departure Days:', departureDays);
-    console.log('Days in Month:', daysInMonth);
-    console.log('Valid Departure Days:', validDepartureDays);
+    // console.log('Departure Days:', departureDays);
+    // console.log('Days in Month:', daysInMonth);
+    // console.log('Valid Departure Days:', validDepartureDays);
 
     return validDepartureDays;
   }
@@ -523,11 +523,11 @@ export class PlanningChart2Component implements OnInit{
   }
 
   startSelection(roomId: number, day: Date) {
-    console.log(this.getAllBookings(1));
-    console.log(day);
-    console.log(this.isEndOfBooking(1, day))
-    if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day) || this.isDateBeforeToday(day)) return;
-    console.log(new Date(day.getFullYear(), day.getMonth(), day.getDate()));
+    if(!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day) || this.isDateBeforeToday(day)){
+      this.selectedRoomId = 0;
+      this.highlightedDays[roomId] = [];
+      return;
+    }
     this.isSelecting = true;
     this.selectedRoomId = roomId;
     this.selectedDates = [day];
@@ -538,9 +538,8 @@ export class PlanningChart2Component implements OnInit{
 
 
   formatDateToString(date: Date): string {
-    // Format date as YYYY-MM-DD
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
@@ -552,24 +551,24 @@ export class PlanningChart2Component implements OnInit{
   
 
   continueSelection(roomId: number, day: Date) {
-    if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;
-    
-    if (this.isSelecting && roomId === this.selectedRoomId) {
+    if(!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)){
+      this.selectedRoomId = 0;
+      this.highlightedDays[roomId] = [];
+      return;
+    } 
+    if(this.isSelecting && roomId === this.selectedRoomId){
       let lastDate = this.selectedDates[this.selectedDates.length - 1];
       let newDateRange = [...this.selectedDates];
       const constraints = this.getRoomConstraints(roomId);
-      console.log(constraints);
       if (constraints) {
-        const start = constraints[this.getDayOfWeekString(new Date(day.getFullYear(), day.getMonth(), this.selectedDates[0].getDate()).getDay())];
-        // console.log('Constraint For Day:',start);
-
+        const start = constraints[this.getDayOfWeekString(new Date(this.selectedDates[0]).getDay())];
           if (day > lastDate) {
-            while (newDateRange.length < start.maxStay+1 && day > lastDate) {
-              lastDate.setDate(lastDate.getDate() + 1);
-              // lastDate++;
-              if (day >= lastDate) {
-                if (this.isDayAvailable(roomId, lastDate) && !this.isEndOfBooking(roomId, day) && !this.isMiddleCell(roomId, day)) {
-                  newDateRange.push(lastDate);
+            let currentLastDate = new Date(lastDate);
+            while (newDateRange.length < start.maxStay + 1 && day > currentLastDate) {
+              currentLastDate.setDate(currentLastDate.getDate() + 1);
+              if (day >= currentLastDate) {
+                if (this.isDayAvailable(roomId, currentLastDate) && !this.isEndOfBooking(roomId, day) && !this.isMiddleCell(roomId, day)) {
+                  newDateRange.push(new Date(currentLastDate));
                 }else{
                   break;
                 }
@@ -578,14 +577,14 @@ export class PlanningChart2Component implements OnInit{
               }
             }
             this.selectedDates = newDateRange;
-            console.log(this.selectedDates)
           } else if (day < lastDate) {
-            while (newDateRange.length > start.minStay && day < lastDate) {
-              lastDate.setDate(lastDate.getDate() - 1);
-              // lastDate--;
-              if (day <= lastDate) {
-                  // newDateRange = newDateRange.filter(d => d !== lastDate + 1);
-                  newDateRange = newDateRange.filter(d => d.getDate() !== lastDate.getDate() + 1);
+            let currentLastDate = new Date(lastDate);
+            while (newDateRange.length > start.minStay + 1 && day < currentLastDate) {
+              currentLastDate.setDate(currentLastDate.getDate() - 1);
+              if (day <= currentLastDate) {
+                  const dayToRemove = new Date(currentLastDate);
+                  dayToRemove.setDate(dayToRemove.getDate() + 1);
+                  newDateRange = newDateRange.filter(d => d.getTime() !== dayToRemove.getTime());
               } else {
                 break;
               }
@@ -595,21 +594,22 @@ export class PlanningChart2Component implements OnInit{
       } else {
         console.warn('No constraints available for room:', roomId);
       }
-      console.log(this.selectedDates);
     }
   }
 
   endSelection(roomId: number, day: Date) {
-    if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) {
+    if(!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)){
+      this.selectedRoomId = 0;
+      this.highlightedDays[roomId] = [];
       return;
-    }
+    } 
   
     // Get the constraints for the specified room
     const roomConstraints = this.getRoomConstraints(roomId);
     const constraintForDay = roomConstraints[this.getDayOfWeekString(this.selectedDates[0].getDay())]
     
 
-    console.log(constraintForDay, day.toString());
+    // console.log(constraintForDay, day.toString());
   
     if (!constraintForDay) {
       // If no constraints are defined for the day, proceed with the selection
@@ -623,7 +623,7 @@ export class PlanningChart2Component implements OnInit{
   
     // Check if the selected day is a valid departure day
     const isDepartureDayValid = constraintForDay.departureDays.includes(lastDay);
-    console.log(isDepartureDayValid);
+    // console.log(isDepartureDayValid);
   
     if (isDepartureDayValid) {
       // If valid, apply the selection constraints
@@ -704,17 +704,14 @@ export class PlanningChart2Component implements OnInit{
   }
 
   bookRoom(room: any, stayDateFrom: string, stayDateTo: string) {
-    console.log("kasndkaskdlkasnd");
     let data = this.getDataOfRoom(room);
-    console.log(stayDateFrom, stayDateTo , "yoyoyoyo");
     const constraints = this.getRoomConstraints(room);
-    console.log(constraints);
-    console.log(this.getRoomConstraints(2))
+    // console.log(constraints);
+    // console.log(this.getRoomConstraints(2))
     const date = new Date(stayDateFrom);
     // const day = date.getDate();
     const start = constraints[this.getWeekday(date)];
-    console.log(start); 
-    this.roomService.setFilterDates(stayDateFrom, stayDateTo);
+    this.roomService.setFilterDates(stayDateFrom, stayDateTo, 0);
     this.router.navigate(['/form'], {
       state: {
         room: {
