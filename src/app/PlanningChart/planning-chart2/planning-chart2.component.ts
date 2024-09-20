@@ -362,6 +362,38 @@ export class PlanningChart2Component implements OnInit{
     return date < today;
   }
 
+  calculateMinDev(roomId: number): number{
+    const deviations = this.availability
+        .filter(room => room.roomId === roomId)
+        .map(room => room.minDeviation)
+        .filter(dev => dev !== null); // Exclude null values
+
+    // Return the minimum minDeviation or 0 if no valid deviations found
+    return deviations.length > 0 ? Math.min(...deviations) : 0;
+  }
+  calculateMaxDev(roomId: number): number{
+    const deviations = this.availability
+        .filter(room => room.roomId === roomId)
+        .map(room => room.maxDeviation)
+        .filter(dev => dev !== null); // Exclude null values
+
+    // Return the minimum minDeviation or 0 if no valid deviations found
+    return deviations.length > 0 ? Math.max(...deviations) : 0;
+  }
+
+  isMinMaxDev(roomId: number, day: Date): boolean{
+    let minDev = this.calculateMinDev(roomId);
+    // console.log(minDev);
+    let maxDev = this.calculateMaxDev(roomId);
+    // console.log(maxDev);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let minTodayDate = new Date(today.getFullYear(), today.getMonth(),today.getDate() + minDev);
+    let maxTodayDate = new Date(today.getFullYear(), today.getMonth(),today.getDate() + maxDev);
+    // console.log(day, minTodayDate, maxTodayDate);
+    return day < minTodayDate || day > maxTodayDate;
+  }
+
 
   isDayAvailable(roomId: number, day: Date): boolean {
     const availabilityData = this.availability.filter(item => item.roomId === roomId);
@@ -388,7 +420,7 @@ export class PlanningChart2Component implements OnInit{
 
     return constraints.some(constraint => 
       constraint.arrivalDays.includes(dayOfWeekString) &&
-      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day)
+      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMinMaxDev(roomId, day)
     );
   }
 
@@ -426,7 +458,9 @@ export class PlanningChart2Component implements OnInit{
         arrivalDays: curr.arrivalDays,
         departureDays: curr.departureDays,
         minStay: curr.minStay,
-        maxStay: curr.maxStay
+        maxStay: curr.maxStay,
+        minDeviation: curr.minDeviation,
+        maxDeviation: curr.maxDeviation
       });
       return acc;
     }, {} as { [roomId: number]: Array<RoomConstraint> });

@@ -83,7 +83,8 @@
                             'available': isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
                             'unavailable': !isDayAvailable(room.roomId, day) && !isDayBooked(room.roomId, day),
                             'arrival-day': isArrivalDay(room.roomId, day),
-                            'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day)
+                            'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day),
+                           
                         }"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"
@@ -97,7 +98,7 @@
     </table>
 </div>
 
-
+<!-- 'minMaxDev': isMinMaxDev(room.roomId), -->
 <!-- 'booked': isDayBooked(room.roomId, day),
                             'half-cell': isDayBooked(room.roomId, day), -->
 

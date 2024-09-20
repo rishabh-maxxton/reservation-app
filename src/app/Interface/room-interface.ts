@@ -1,4 +1,5 @@
 export interface Room {
+    filter(arg0: (room: any) => boolean): Room;
     roomId: number;
     locationId: number;
     locationName: string;
@@ -37,4 +38,6 @@ export interface RoomConstraint {
   departureDays: string[]; 
   minStay: number; 
   maxStay: number; 
+  minDeviation: number;
+  maxDeviation: number;
 }

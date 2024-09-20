@@ -158,6 +158,11 @@ th, td {
 //     cursor: pointer;
 // }
 
+.minMaxDev{
+    color: $white-color;
+    cursor: not-allowed;
+}
+
 .cell {
     position: relative; // For positioning pseudo-elements
     margin: 10px; // Small margin to create separation between cells

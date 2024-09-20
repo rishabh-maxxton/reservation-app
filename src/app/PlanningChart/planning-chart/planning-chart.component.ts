@@ -131,7 +131,7 @@ export class PlanningChartComponent implements OnInit {
       return {};
     }
   
-    const constraintMap: { [key: string]: { minStay: number, maxStay: number, departureDays: string[] } } = {};
+    const constraintMap: { [key: string]: { minStay: number, maxStay: number, departureDays: string[], minDeviation: number, maxDeviation: number } } = {};
   
     constraints.forEach(constraint => {
       constraint.arrivalDays.forEach(day => {
@@ -139,11 +139,15 @@ export class PlanningChartComponent implements OnInit {
           constraintMap[day] = {
             minStay: constraint.minStay,
             maxStay: constraint.maxStay,
-            departureDays: constraint.departureDays
+            departureDays: constraint.departureDays,
+            minDeviation: constraint.minDeviation,
+            maxDeviation: constraint.maxDeviation
           };
         } else {
           constraintMap[day].minStay = Math.min(constraintMap[day].minStay, constraint.minStay);
           constraintMap[day].maxStay = Math.max(constraintMap[day].maxStay, constraint.maxStay);
+          constraintMap[day].minDeviation = Math.min(constraintMap[day].minDeviation, constraint.minDeviation);
+          constraintMap[day].maxDeviation = Math.max(constraintMap[day].maxDeviation, constraint.maxDeviation);
           const allDepartureDays = new Set([...constraintMap[day].departureDays, ...constraint.departureDays]);
           constraintMap[day].departureDays = Array.from(allDepartureDays);
         }
@@ -151,6 +155,25 @@ export class PlanningChartComponent implements OnInit {
     });
     console.log(constraintMap);
     return constraintMap; // Ensure this returns an array with a single object
+  }
+
+  extractRoomConstraints1(): void {
+    this.roomConstraints1 = this.availability.reduce((acc, curr) => {
+      const roomId = curr.roomId;
+      if (!acc[roomId]) {
+        acc[roomId] = [];
+      }
+      acc[roomId].push({
+        arrivalDays: curr.arrivalDays,
+        departureDays: curr.departureDays,
+        minStay: curr.minStay,
+        maxStay: curr.maxStay,
+        minDeviation: curr.minDeviation,
+        maxDeviation: curr.maxDeviation
+      });
+      return acc;
+    }, {} as { [roomId: number]: Array<RoomConstraint> });
+    console.log(this.roomConstraints1);
   }
   
 
@@ -340,8 +363,40 @@ isMiddleCell(roomId: number, day: number): boolean {
   return false;
 }
 
+  calculateMinDev(roomId: number): number{
+    const deviations = this.availability
+        .filter(room => room.roomId === roomId)
+        .map(room => room.minDeviation)
+        .filter(dev => dev !== null); // Exclude null values
+
+    // Return the minimum minDeviation or 0 if no valid deviations found
+    return deviations.length > 0 ? Math.min(...deviations) : 0;
+  }
+
+  calculateMaxDev(roomId: number): number{
+    const deviations = this.availability
+        .filter(room => room.roomId === roomId)
+        .map(room => room.maxDeviation)
+        .filter(dev => dev !== null); // Exclude null values
+
+    // Return the minimum minDeviation or 0 if no valid deviations found
+    return deviations.length > 0 ? Math.max(...deviations) : 0;
+  }
+
+  isMinMaxDev(roomId: number, day: number): boolean{
+    let minDev = this.calculateMinDev(roomId);
+    // console.log(minDev);
+    let maxDev = this.calculateMaxDev(roomId);
+    // console.log(maxDev);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let todayDate = today.getDate();
+    return day < todayDate + minDev || day > todayDate + maxDev;
+  }
+
 
   isDayAvailable(roomId: number, day: number): boolean {
+    
     const availabilityData = this.availability.filter(item => item.roomId === roomId);
     const date = new Date(this.selectedYear, this.selectedMonth - 1, day);
     const isValidDate = availabilityData.some(item => {
@@ -370,8 +425,6 @@ isMiddleCell(roomId: number, day: number): boolean {
   //   return true;
   // }
 
-
-
   isArrivalDay(roomId: number, day: number): boolean {
     const constraints = this.roomConstraints1[roomId] || [];
     const date = new Date(this.selectedYear, this.selectedMonth - 1, day);
@@ -379,7 +432,7 @@ isMiddleCell(roomId: number, day: number): boolean {
     
     return constraints.some(constraint => 
       constraint.arrivalDays.includes(dayOfWeekString) &&
-      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMiddleCell(roomId, day)
+      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMiddleCell(roomId, day) && !this.isMinMaxDev(roomId, day)
     );
   }
 
@@ -424,22 +477,7 @@ isMiddleCell(roomId: number, day: number): boolean {
     // console.log(this.roomConstraints);
   }
 
-  extractRoomConstraints1(): void {
-    this.roomConstraints1 = this.availability.reduce((acc, curr) => {
-      const roomId = curr.roomId;
-      if (!acc[roomId]) {
-        acc[roomId] = [];
-      }
-      acc[roomId].push({
-        arrivalDays: curr.arrivalDays,
-        departureDays: curr.departureDays,
-        minStay: curr.minStay,
-        maxStay: curr.maxStay
-      });
-      return acc;
-    }, {} as { [roomId: number]: Array<RoomConstraint> });
-    // console.log(this.roomConstraints1);
-  }
+  
 
   getDepartureDaysForRange(roomId: number, startDay: number, departureDays: string[], maxStay: number): number[] {
     console.log('Departure Days:', departureDays);
@@ -492,10 +530,17 @@ isMiddleCell(roomId: number, day: number): boolean {
     this.applySelectionConstraints(roomId, day);
     this.extractRoomConstraints1();
     this.highlightDepartureDays(roomId, day);
+    // this.isMinMaxDev(2);
   }
   
   continueSelection(roomId: number, day: number) {
-    if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)) return;
+    if (!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day))
+      {
+        this.selectedRoomId = 0;
+        this.highlightedDays[roomId] = [];
+        return;
+
+      } 
   
     if (this.isSelecting && roomId === this.selectedRoomId) {
       let lastDate = this.selectedDates[this.selectedDates.length - 1];
@@ -511,6 +556,7 @@ isMiddleCell(roomId: number, day: number): boolean {
               lastDate++;
               if (day >= lastDate) {
                 if (this.isDayAvailable(roomId, lastDate) && !this.isEndOfBooking(roomId, day) && !this.isMiddleCell(roomId, day)) {
+                  console.log(this.isEndOfBooking(roomId, day))
                   newDateRange.push(lastDate);
                 }else{
                   break;
@@ -520,7 +566,7 @@ isMiddleCell(roomId: number, day: number): boolean {
               }
             }
             this.selectedDates = newDateRange;
-            console.log(this.selectedDates.includes(day))
+            console.log(this.selectedDates)
           } else if (day < lastDate) {
             while (newDateRange.length > start.minStay && day < lastDate) {
               lastDate--;

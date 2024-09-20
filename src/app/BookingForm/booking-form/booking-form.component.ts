@@ -239,6 +239,12 @@
                 return { roomUnavailable: true };
               }
             }
+
+            if(control === this.bookingForm.get('stayDateTo')){
+              if(bookingStart.isSameOrAfter(this.bookingForm.get('stayDateFrom')?.value) && bookingEnd.isSameOrBefore(this.bookingForm.get('stayDateTo')?.value)){
+                return { roomUnavailable: true };
+              }
+            }
           }
         }
       }

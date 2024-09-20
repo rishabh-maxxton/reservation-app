@@ -69,7 +69,8 @@ export class HomeComponent implements OnInit {
 
   isDateOverlap(start1: any, end1: any, start2: any, end2: any): boolean {
     console.log(start1, end1, start2, end2);
-    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]');
+    // return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]');
+    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]') && moment(start1).isBetween(moment(start2), moment(end2), null, '[]') || moment(end1).isBetween(moment(start2), moment(end2), null, '[]');
     // return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
   }
 

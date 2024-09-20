@@ -41,74 +41,64 @@ export class NewReservationModalComponent implements OnInit {
    
     this.roomService.getRooms().subscribe((data: Room[]) => {
       this.rooms = data;
-      // this.filteredRooms = data;
-      // this.calculateDateConstraints();
     });
    
     this.reservationForm.valueChanges.subscribe(() => {
       this.onFilter();
-
-      this.roomService.setFilterDates(this.reservationForm.get('arrivalDate')?.value.toISOString().split('T')[0], this.reservationForm.get('departureDate')?.value.toISOString().split('T')[0]);
+      this.roomService.setFilterDates(this.formatDate(this.reservationForm.get('arrivalDate')?.value), this.formatDate(this.reservationForm.get('departureDate')?.value));
     });
     // this.reservationForm.valueChanges.subscribe(() => this.roomService.setFilterDates(this.reservationForm.get('arrivalDate')?.value, this.reservationForm.get('departureDate')?.value));
   }
 
-  //   generateArrivalDates(room: Room): Set<string> {
-  //   const arrivalDates = new Set<string>();
-  //   if (!room.minDeviation || !room.maxDeviation) return arrivalDates;
+  formatDate(dateString: string) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
-  //   const today = new Date();
-  //   const minDate = new Date(today.getTime() + (room.minDeviation * 24 * 60 * 60 * 1000)); // minDeviation days from today
-  //   const maxDate = new Date(today.getTime() + (room.maxDeviation * 24 * 60 * 60 * 1000)); // maxDeviation days from today
+    return `${year}-${month}-${day}`;
+  }
 
-  //   for (let date = minDate; date <= maxDate; date.setDate(date.getDate() + 1)) {
-  //     arrivalDates.add(date.toISOString().split('T')[0]); // Format as yyyy-mm-dd
-  //   }
-
-  //   return arrivalDates;
-  // }
 
   generateArrivalDates(room: Room): Set<string> {
     const arrivalDates = new Set<string>();
-    if (!room.minDeviation || !room.maxDeviation || !room.bookDateFrom || !room.bookDateTo || !room.arrivalDays) return arrivalDates;
+    if ( !room.maxDeviation || !room.bookDateFrom || !room.bookDateTo || !room.arrivalDays) return arrivalDates;
   
     const today = new Date();
     const bookDateFrom = new Date(room.bookDateFrom || " ");
     const bookDateTo = new Date(room.bookDateTo || " ");
   
-    // Check if today is within the booking range
     if (today < bookDateFrom || today > bookDateTo) {
-      return arrivalDates; // No dates to generate if today is not in the booking range
+      return arrivalDates;
     }
   
-    // Calculate min and max dates based on deviation
-    const minDate = new Date(today.getTime() + (room.minDeviation || 0 * 24 * 60 * 60 * 1000)); // minDeviation days from today
-    const maxDate = new Date(today.getTime() + (room.maxDeviation * 24 * 60 * 60 * 1000)); // maxDeviation days from today
+    const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (room.minDeviation || 0)); 
+    // const minDate = new Date(today.getTime() + (((room.minDeviation || 0)) * 24 * 60 * 60 * 1000)); // minDeviation days from today
+    const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + room.maxDeviation); 
+    // const maxDate = new Date(today.getTime() + ((room.maxDeviation) * 24 * 60 * 60 * 1000)); // maxDeviation days from today
   
     // Ensure the deviation dates fall within the booking range
-    const effectiveMinDate = minDate < bookDateFrom ? bookDateFrom : minDate;
-    const effectiveMaxDate = maxDate > bookDateTo ? bookDateTo : maxDate;
+    // const effectiveMinDate = minDate < bookDateFrom ? bookDateFrom : minDate;
+    // const effectiveMaxDate = maxDate > bookDateTo ? bookDateTo : maxDate;
   
-    // Helper function to get the day of the week as a string
     const getDayOfWeek = (date: Date): string => {
       const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
       return daysOfWeek[date.getDay()];
     }
   
-    // Add dates from effectiveMinDate to effectiveMaxDate to the set, checking arrivalDays
     for (let date = minDate; date <= maxDate; date.setDate(date.getDate() + 1)) {
       const dayOfWeek = getDayOfWeek(date);
       let arrivals = room.arrivalDays || [];
       if (arrivals.includes(dayOfWeek)) {
-        arrivalDates.add(date.toISOString().split('T')[0]); // Format as yyyy-mm-dd
+        arrivalDates.add(date.toISOString().split('T')[0]);
       }
     }
+
     return arrivalDates;
   }
 
   generateCombinedArrivalDates(): Set<string> {
     const combinedDates = new Set<string>();
-
     this.rooms.forEach(room => {
       const roomDates = this.generateArrivalDates(room);
       roomDates.forEach(date => combinedDates.add(date));
@@ -119,22 +109,19 @@ export class NewReservationModalComponent implements OnInit {
 
   arrivalDateFilter = (date: Date | null): boolean => {
     if (!date) return false;
-
     const arrivalDatesSet = this.generateCombinedArrivalDates();
     const formattedDate = date.toISOString().split('T')[0];
 
-    return arrivalDatesSet.has(formattedDate) && date >= this.today;
+    return arrivalDatesSet.has(formattedDate);
   }
 
   departureDateFilter = (date: Date | null): boolean => {
     if (!date) return false;
   
     const arrivalDate = new Date(this.reservationForm.get('arrivalDate')?.value);
-    if (!arrivalDate || date <= arrivalDate) return false; // Departure date should be after the arrival date
+    if (!arrivalDate || date <= arrivalDate) return false;
   
-    // Generate a set of valid departure dates based on the rooms array
     const validDepartureDates = new Set<string>();
-    const today = new Date();
   
     this.rooms.forEach(room => {
       if (room.stayDateFrom && room.stayDateTo) {
@@ -143,7 +130,6 @@ export class NewReservationModalComponent implements OnInit {
         const minStay = room.minStay ?? 0;
         const maxStay = room.maxStay ?? Infinity;
   
-        // Calculate the minimum and maximum possible departure dates based on arrival date
         const minDepartureDate = new Date(arrivalDate);
         minDepartureDate.setDate(arrivalDate.getDate() + minStay);
   
@@ -151,30 +137,61 @@ export class NewReservationModalComponent implements OnInit {
         maxDepartureDate.setDate(arrivalDate.getDate() + maxStay);
   
         // Ensure the departure dates fall within the room's stay dates
-        const effectiveMinDepartureDate = minDepartureDate < stayDateFrom ? stayDateFrom : minDepartureDate;
-        const effectiveMaxDepartureDate = maxDepartureDate > stayDateTo ? stayDateTo : maxDepartureDate;
+        // const effectiveMinDepartureDate = minDepartureDate < stayDateFrom ? stayDateFrom : minDepartureDate;
+        // const effectiveMaxDepartureDate = maxDepartureDate > stayDateTo ? stayDateTo : maxDepartureDate;
   
-        // Helper function to get the day of the week as a string
         const getDayOfWeek = (date: Date): string => {
           const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-          // const daysOfWeek = ["Su", "Mo", "Tu", "We", "Tu", "Fri", "Sat"];
-          return daysOfWeek[date.getDay()].toUpperCase(); // Convert to upper case to match departureDays
+          return daysOfWeek[date.getDay()];
         }
-  
-        // Add valid dates to the set, checking departureDays
-        for (let currentDate = effectiveMinDepartureDate; currentDate <= effectiveMaxDepartureDate; currentDate.setDate(currentDate.getDate() + 1)) {
+
+        for (let currentDate = minDepartureDate; currentDate <= maxDepartureDate; currentDate.setDate(currentDate.getDate() + 1)) {
           const dayOfWeek = getDayOfWeek(currentDate);
           if (room.departureDays?.includes(dayOfWeek)) {
             const formattedDate = currentDate.toISOString().split('T')[0];
-            validDepartureDates.add(formattedDate);
+            if (this.checkFilteredRooms(arrivalDate, currentDate)) {
+            validDepartureDates.add(formattedDate);}
           }
         }
       }
     });
-  
-    // Check if the given date is within the valid departure dates
     const formattedDate = date.toISOString().split('T')[0];
-    return validDepartureDates.has(formattedDate) && date >= today;
+
+    return validDepartureDates.has(formattedDate);
+  }
+
+  checkFilteredRooms(arrivalDate: Date, departureDate: Date): boolean {
+    const numberOfGuests = this.reservationForm.get('numberOfGuests')?.value;
+  
+    let filteredRooms1 = this.rooms.filter(room => {
+      if (!room.stayDateFrom || !room.stayDateTo || !room.minStay || !room.maxStay || !room.arrivalDays || !room.departureDays) {
+        return false; // Skip rooms missing necessary constraints
+      }
+  
+      const stayDateFrom = new Date(room.stayDateFrom);
+      const stayDateTo = new Date(room.stayDateTo);
+      const minStay = room.minStay;
+      const maxStay = room.maxStay;
+      const arrivalDays = room.arrivalDays;
+      const departureDays = room.departureDays;
+
+      const numberOfNights = (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24);
+  
+      const getDayOfWeek = (date: Date): string => {
+        const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+        return daysOfWeek[date.getDay()];
+      }
+      const isDateInRange = arrivalDate >= stayDateFrom && departureDate <= stayDateTo;
+      const isStayValid = numberOfNights >= minStay && numberOfNights <= maxStay;
+      const isArrivalDayValid = arrivalDays.includes(getDayOfWeek(arrivalDate));
+      const isDepartureDayValid = departureDays.includes(getDayOfWeek(departureDate));
+      const isCapacitySufficient = room.guestCapacity >= numberOfGuests;
+  
+      return isDateInRange && isStayValid && isArrivalDayValid && isDepartureDayValid && isCapacitySufficient;
+    });
+    filteredRooms1 = this.filterOutBookedRooms1(filteredRooms1, arrivalDate, departureDate);
+  
+    return filteredRooms1.length > 0; // Return true if there are available rooms, false otherwise
   }
 
   onFilter() {
@@ -186,7 +203,7 @@ export class NewReservationModalComponent implements OnInit {
     // if (arrivalDate && departureDate && numberOfGuests) {
       this.filteredRooms = this.rooms.filter(room => {
         if (!room.stayDateFrom || !room.stayDateTo || !room.minStay || !room.maxStay || !room.arrivalDays || !room.departureDays) {
-          return false; // Skip rooms missing necessary constraints
+          return false;
         }
   
         const stayDateFrom = new Date(room.stayDateFrom);
@@ -195,29 +212,16 @@ export class NewReservationModalComponent implements OnInit {
         const maxStay = room.maxStay;
         const arrivalDays = room.arrivalDays;
         const departureDays = room.departureDays;
-  
-        // Calculate the number of nights between arrival and departure
         const numberOfNights = (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24);
-  
-        // Helper function to get the day of the week as a string
         const getDayOfWeek = (date: Date): string => {
           const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-          return daysOfWeek[date.getDay()].toUpperCase(); // Convert to uppercase to match arrays
+          return daysOfWeek[date.getDay()];
         }
   
-        // Check if arrival and departure dates fall within the room's stay dates
         const isDateInRange = arrivalDate >= stayDateFrom && departureDate <= stayDateTo;
-  
-        // Check if the number of nights falls within minStay and maxStay
         const isStayValid = numberOfNights >= minStay && numberOfNights <= maxStay;
-  
-        // Check if arrival date's day is in the room's arrivalDays
         const isArrivalDayValid = arrivalDays.includes(getDayOfWeek(arrivalDate));
-  
-        // Check if departure date's day is in the room's departureDays
         const isDepartureDayValid = departureDays.includes(getDayOfWeek(departureDate));
-  
-        // Check if room capacity is sufficient
         const isCapacitySufficient = room.guestCapacity >= numberOfGuests;
   
         return isDateInRange && isStayValid && isArrivalDayValid && isDepartureDayValid && isCapacitySufficient;
@@ -229,17 +233,22 @@ export class NewReservationModalComponent implements OnInit {
     this.filterOutBookedRooms();
   }
 
-  filterOutBookedRooms(): void {
-    console.log("Heyy");
+  filterOutBookedRooms1(filteredRooms1 :Room[], arrivalDate: Date, departureDate: Date): Room[]{
     const bookings = this.getBookingsFromLocalStorage();
-    console.log(bookings);
+    return filteredRooms1 = filteredRooms1.filter(room => {
+      return !bookings.some(booking => 
+        booking.bookingInfo.roomNo === room.roomId && this.isDateOverlap(booking.bookingInfo.stayDateFrom, booking.bookingInfo.stayDateTo, arrivalDate, departureDate)
+      );
+    });
+  }
 
+  filterOutBookedRooms(): void {
+    const bookings = this.getBookingsFromLocalStorage();
     this.filteredRooms = this.filteredRooms.filter(room => {
       return !bookings.some(booking => 
         booking.bookingInfo.roomNo === room.roomId && this.isDateOverlap(booking.bookingInfo.stayDateFrom, booking.bookingInfo.stayDateTo, this.reservationForm.value.arrivalDate, this.reservationForm.value.departureDate)
       );
     });
-    console.log(this.filteredRooms);
   }
 
   getBookingsFromLocalStorage(): any[] {
@@ -248,11 +257,6 @@ export class NewReservationModalComponent implements OnInit {
       const key = localStorage.key(i);
       if (key && key.startsWith('booking_')) {
         const booking = JSON.parse(localStorage.getItem(key) || '{}');
-        // console.log('Booking Start:', new Date(booking.bookingInfo.stayDateFrom));
-        // console.log('Booking End:', new Date(booking.bookingInfo.stayDateTo));
-        // console.log('Form Start:', new Date(this.formData.startDate));
-        // console.log('Form End:', new Date(this.formData.endDate));
-        // console.log(booking.bookingInfo.stayDateFrom)
         bookings.push(booking);
       }
     }
@@ -260,57 +264,7 @@ export class NewReservationModalComponent implements OnInit {
   }
 
   isDateOverlap(start1: any, end1: any, start2: any, end2: any): boolean {
-    console.log(start1, end1, start2, end2);
-    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]');
-    // return new Date(start1) <= new Date(end2) && new Date(start2) <= new Date(end1);
-  }
-
-  
-
-  // onFilter() {
-  //   const formValues = this.reservationForm.value;
-  //   const arrivalDate = new Date(formValues.arrivalDate);
-  //   const departureDate = new Date(formValues.departureDate);
-  //   const numberOfGuests = formValues.numberOfGuests;
-  
-  //   if (arrivalDate && departureDate && numberOfGuests) {
-  //     const validArrivalDates = this.generateCombinedArrivalDates();
-  
-  //     // Filter rooms based on constraints
-  //     this.filteredRooms = this.rooms.filter(room => {
-  //       if (!room.stayDateFrom || !room.stayDateTo) return false; // Skip rooms without stay date constraints
-        
-  //       const stayDateFrom = new Date(room.stayDateFrom);
-  //       const stayDateTo = new Date(room.stayDateTo);
-  //       const minStay = room.minStay ?? 0;
-  //       const maxStay = room.maxStay ?? Infinity;
-  
-  //       // Check if arrival and departure dates are within room's stay constraints
-  //       const effectiveMinDepartureDate = new Date(arrivalDate);
-  //       effectiveMinDepartureDate.setDate(arrivalDate.getDate() + minStay);
-  
-  //       const effectiveMaxDepartureDate = new Date(arrivalDate);
-  //       effectiveMaxDepartureDate.setDate(arrivalDate.getDate() + maxStay);
-  
-  //       const isDateInRange = (arrivalDate >= stayDateFrom && departureDate <= stayDateTo);
-  //       const isStayValid = (departureDate >= effectiveMinDepartureDate && departureDate <= effectiveMaxDepartureDate);
-  //       const isCapacitySufficient = room.guestCapacity >= numberOfGuests;
-        
-  //       // Check if arrival and departure dates align with room's constraints
-  //       const isArrivalDateValid = validArrivalDates.has(arrivalDate.toISOString().split('T')[0]);
-        
-  //       return isDateInRange && isStayValid && isCapacitySufficient && isArrivalDateValid;
-  //     });
-  //   } else {
-  //     // If form values are not valid, show all rooms
-  //     this.filteredRooms = this.rooms;
-  //   }
-  // }
-  
-
-  bookNow(room: Room) {
-    // Navigate to the booking form page with room details, if needed
-    this.router.navigate(['/booking-form'], { queryParams: { roomId: room.roomId } });
+    return moment(start2).isBetween(moment(start1), moment(end1), null, '[]') || moment(end2).isBetween(moment(start1), moment(end1), null, '[]') && moment(start1).isBetween(moment(start2), moment(end2), null, '[]') || moment(end1).isBetween(moment(start2), moment(end2), null, '[]');
   }
 
   onSave() {
@@ -322,133 +276,3 @@ export class NewReservationModalComponent implements OnInit {
     this.dialogRef.close();
   }
 }
-
-// import { Component, OnInit } from '@angular/core';
-// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-// import { MatDialogRef } from '@angular/material/dialog';
-// import { Router } from '@angular/router';
-// import { RoomServiceService } from '../../Service/room-service.service';
-// import { Room } from '../../Interface/room-interface';
-
-// @Component({
-//   selector: 'app-new-reservation-modal',
-//   templateUrl: './new-reservation-modal.component.html',
-//   styleUrls: ['./new-reservation-modal.component.scss']
-// })
-// export class NewReservationModalComponent implements OnInit {
-//   reservationForm!: FormGroup;
-//   rooms: Room[] = [];
-//   filteredRooms: Room[] = [];
-//   today: Date;
-//   displayedColumns: string[] = ['roomId', 'roomName', 'locationName', 'pricePerDayPerPerson', 'guestCapacity', 'bookNow'];
-//   minArrivalDate: Date | null = null;
-//   maxArrivalDate: Date | null = null;
-//   minDepartureDate: Date | null = null;
-//   maxDepartureDate: Date | null = null;
-
-//   constructor(
-//     private fb: FormBuilder,
-//     public dialogRef: MatDialogRef<NewReservationModalComponent>,
-//     private roomService: RoomServiceService,
-//     private router: Router
-//   ) {
-//     const now = new Date();
-//     this.today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-//   }
-
-//   ngOnInit() {
-//     this.reservationForm = this.fb.group({
-//       arrivalDate: [null, Validators.required],
-//       departureDate: [null, Validators.required],
-//       numberOfGuests: [null, Validators.required]
-//     });
-
-//     this.roomService.getRooms().subscribe((data: Room[]) => {
-//       this.rooms = data;
-//       this.filteredRooms = data;
-//       // this.calculateDateConstraints();
-//     });
-
-//     this.reservationForm.valueChanges.subscribe(() => this.onFilter());
-//   }
-
-//   generateArrivalDates(room: Room): Set<string> {
-//     const arrivalDates = new Set<string>();
-//     if (!room.minDeviation || !room.maxDeviation) return arrivalDates;
-
-//     const today = new Date();
-//     const minDate = new Date(today.getTime() + (room.minDeviation * 24 * 60 * 60 * 1000)); // minDeviation days from today
-//     const maxDate = new Date(today.getTime() + (room.maxDeviation * 24 * 60 * 60 * 1000)); // maxDeviation days from today
-
-//     for (let date = minDate; date <= maxDate; date.setDate(date.getDate() + 1)) {
-//       arrivalDates.add(date.toISOString().split('T')[0]); // Format as yyyy-mm-dd
-//     }
-
-//     return arrivalDates;
-//   }
-
-//   generateCombinedArrivalDates(): Set<string> {
-//     const combinedDates = new Set<string>();
-
-//     this.rooms.forEach(room => {
-//       const roomDates = this.generateArrivalDates(room);
-//       roomDates.forEach(date => combinedDates.add(date));
-//     });
-
-//     return combinedDates;
-//   }
-
-//   arrivalDateFilter = (date: Date | null): boolean => {
-//     if (!date) return false;
-
-//     const arrivalDatesSet = this.generateCombinedArrivalDates();
-//     const formattedDate = date.toISOString().split('T')[0];
-
-//     return arrivalDatesSet.has(formattedDate) && date >= this.today;
-//   }
-
-//     departuredateFilter = (date: Date | null): boolean => {
-//     if (!date) return false;
-
-//     // Disable dates outside the computed constraints
-//     const isDateInRange = 
-//       (this.minArrivalDate ? date >= this.minArrivalDate : true) &&
-//       (this.maxArrivalDate ? date <= this.maxArrivalDate : true);
-
-//     return isDateInRange && (date >= this.today);
-//   }
-
-//   onFilter() {
-//     const formValues = this.reservationForm.value;
-//     const arrivalDate = new Date(formValues.arrivalDate);
-//     const departureDate = new Date(formValues.departureDate);
-//     const numberOfGuests = formValues.numberOfGuests;
-
-//     if (arrivalDate && departureDate && numberOfGuests) {
-//       const filtered = this.rooms.filter(room => {
-//         const stayDateFrom = new Date(room.stayDateFrom!);
-//         const stayDateTo = new Date(room.stayDateTo!);
-//         const isDateInRange = (arrivalDate >= stayDateFrom && departureDate <= stayDateTo);
-//         const isCapacitySufficient = room.guestCapacity >= numberOfGuests;
-//         return isDateInRange && isCapacitySufficient;
-//       });
-
-//       this.filteredRooms = filtered;
-//     } else {
-//       this.filteredRooms = this.rooms;
-//     }
-//   }
-
-//   bookNow(room: Room) {
-//     this.router.navigate(['/booking-form'], { queryParams: { roomId: room.roomId } });
-//   }
-
-//   onSave() {
-//     console.log(this.reservationForm.get('arrivalDate')?.value, this.reservationForm.get('departureDate')?.value, this.reservationForm.get('numberOfGuests')?.value);
-//     console.log(this.rooms, this.filteredRooms);
-//   }
-
-//   onClose() {
-//     this.dialogRef.close();
-//   }
-// }
