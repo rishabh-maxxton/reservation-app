@@ -127,7 +127,6 @@ export class PlanningChart2Component implements OnInit{
     if (booking) {
         const startDateFormatted = `${booking.startDate.getDate()}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
         const endDateFormatted = `${booking.endDate.getDate()}-${this.months[day.getMonth() ]}-${day.getFullYear()}`;
-        // return `Booked by: ${booking.customerName} \n From: ${startDateFormatted} \n To: ${endDateFormatted} \n No. of Guests : ${booking.totalGuests} \n status : ${booking.status}`;
         return ` Booked by: ${booking.customerName} \nFrom: ${startDateFormatted} \nTo: ${endDateFormatted} \nNo. of Guests: ${booking.totalGuests} \nStatus: ${booking.status}`;
     }
     return '';
@@ -533,6 +532,7 @@ export class PlanningChart2Component implements OnInit{
     this.selectedDates = [day];
     this.applySelectionConstraints(roomId, day);
     this.extractRoomConstraints1();
+    console.log(this.roomConstraints1);
     this.highlightDepartureDays(roomId, day);
   }
 
