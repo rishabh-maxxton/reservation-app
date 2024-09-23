@@ -169,6 +169,7 @@ th, td {
     overflow: hidden; // Ensure content doesn’t overflow the rounded corners
 }
 
+
 .start {
     position: relative; // Ensure positioning context
     background-color: $white-color;
@@ -177,18 +178,24 @@ th, td {
     cursor: pointer;
     // padding: 5px 0; // Adjust padding to decrease height
     // margin-top: 3px;
-    padding-top: 4px;
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 3.75rem;
+    // padding-top: 4px;
+    // padding-left: 0;
+    // padding-right: 0;
+    // padding-bottom: 3.75rem;
+    padding: 4px 0 3.75rem;
     overflow: hidden; // To ensure the pseudo-element is contained
+    
 }
 
 // Start pseudo-element
 .start::after {
-    content: '';
+    content: attr(data-user-name);
     display: block;
     position: absolute;
+    color: black; 
+    text-align: left;
+    overflow: hi    dden; // Hide overflow
+    text-overflow: ellipsis;
     top: 0;
     bottom: 0rem;
     width: 60%;
@@ -198,8 +205,8 @@ th, td {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
     background-color: var(--booking-color-start);
-    right: 0; // Position to the right
-    z-index: 1;
+    right: 0;
+    z-index: 11;
 }
 
 // .middle {
@@ -228,7 +235,7 @@ th, td {
     // padding-top: 0rem;
 }
 
-.middle::before{
+.middle::after{
     content: '';
     display: block;
     position: absolute;
@@ -242,9 +249,7 @@ th, td {
     z-index: 1;
 }
 
-.highlighted {
-    background-color: $departureDay; /* Yellow glow */
-  }
+
 // Style for the end of a booking
 .end {
     position: relative; // Ensure positioning context
@@ -277,6 +282,14 @@ th, td {
     left: 0; // Position to the left
     z-index: 1;
 }
+
+
+
+
+.highlighted {
+    background-color: $departureDay; /* Yellow glow */
+  }
+
 
 // .booked {
 //     background-color: $booked;
@@ -376,3 +389,4 @@ th, td {
     padding: 0.5rem;
     margin-bottom: 0.625rem;
 }
+

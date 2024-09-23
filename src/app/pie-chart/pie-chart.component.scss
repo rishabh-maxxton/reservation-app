@@ -1,0 +1,42 @@
+.pie-chart {
+    position: relative;
+    width: 300px; // Fixed size for the chart
+    height: 300px; // Fixed size for the chart
+    border-radius: 50%; // Make it circular
+    overflow: hidden; // Hide overflow
+  }
+  
+  .pie-section {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+  }
+  
+  .tooltip {
+    position: absolute;
+    visibility: hidden; // Default to hidden
+    opacity: 0; // Default to transparent
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    // Tooltip position adjustments
+  }
+  
+  .legend {
+    margin-top: 20px;
+    h6 {
+      font-weight: bold;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+    }
+  }
+  

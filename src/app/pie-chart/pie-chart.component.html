@@ -1,0 +1,27 @@
+<div class="row justify-content-center">
+    <div class="col-5">
+      <div class="pie-chart">
+        <div *ngFor="let item of data; let i = index" 
+             class="pie-section" 
+             [ngStyle]="getPieSectionStyle(i, item.value)"
+             (mouseenter)="showTooltip(i)"
+             (mouseleave)="hideTooltip()">
+          <div class="tooltip" 
+               [ngStyle]="{ 'visibility': tooltipIndex === i ? 'visible' : 'hidden', 'opacity': tooltipIndex === i ? 1 : 0 }">
+            {{ item.label }}: {{ item.value }} ({{ getPercentage(item.value).toFixed(2) }}%)
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="legend">
+        <h6>Legend</h6>
+        <ul>
+          <li *ngFor="let item of data; let i = index" [ngStyle]="{'color': getColor(i)}">
+            {{ item.label }}: {{ item.value }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  

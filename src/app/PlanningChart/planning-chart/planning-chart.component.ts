@@ -79,6 +79,17 @@ export class PlanningChartComponent implements OnInit {
     return '';
   }
 
+  getUserName(roomId: number, day: number): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
+    if(booking){
+      return booking.customerName;
+
+    }
+    return '';
+  }
+
+
   ngOnInit(): void {
     this.roomService.loadRooms().subscribe((data: Room[]) => {
       this.locations = [...new Set(data.map(room => room.locationName))];

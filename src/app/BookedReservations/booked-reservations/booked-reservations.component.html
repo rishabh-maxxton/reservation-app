@@ -1,6 +1,7 @@
 <div class="container-fluid mt-5 mb-5 bordered">
-  
+  <!-- <app-pie-chart [data]="pieChartData"></app-pie-chart> -->
   <button class="btn btn-success" (click)="openReservationModal()"><i class="fa-solid fa-plus"></i> Create New Reservation</button>
+  <!-- <app-pie-chart [data]="pieChartData"></app-pie-chart> -->
     <div class="table-responsive">
       <table class="table table-striped table-bordered">
         <thead class="thead-fixed">
@@ -51,14 +52,5 @@
         </tbody>
       </table>
     </div>
-    <!-- <div class="chart-container">
-      <canvas baseChart
-              [datasets]="[{ data: chartData, label: 'Bookings Status' }]"
-              [labels]="chartLabels"
-              [options]="{ responsive: true }"
-              [legend]="true"
-              [chartType]="'bar'">
-      </canvas>
-    </div> -->
   </div>
   

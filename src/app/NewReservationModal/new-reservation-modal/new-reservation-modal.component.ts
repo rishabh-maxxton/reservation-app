@@ -21,6 +21,7 @@ export class NewReservationModalComponent implements OnInit {
   maxArrivalDate: Date | null = null;
   minDepartureDate: Date | null = null;
   maxDepartureDate: Date | null = null;
+  
 
   constructor(
     private fb: FormBuilder,
@@ -60,7 +61,7 @@ export class NewReservationModalComponent implements OnInit {
   generateArrivalDates(room: Room): Set<string> {
     const arrivalDates = new Set<string>();
     // if ( !room.maxDeviation || !room.bookDateFrom || !room.bookDateTo || !room.arrivalDays) return arrivalDates;
-    if ( !room.maxDeviation ) return arrivalDates;
+    // if ( !room.maxDeviation ) return arrivalDates;
   
     const today = new Date();
     const bookDateFrom = new Date(room.bookDateFrom || " ");
@@ -69,10 +70,13 @@ export class NewReservationModalComponent implements OnInit {
     if (today < bookDateFrom || today > bookDateTo) {
       return arrivalDates;
     }
+
+    const stayDateFrom = room.stayDateFrom ? new Date(room.stayDateFrom) : new Date();
+    const stayDateTo = room.stayDateTo ? new Date(room.stayDateTo) : new Date('2024-12-01');
   
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (room.minDeviation || 0)); 
     // const minDate = new Date(today.getTime() + (((room.minDeviation || 0)) * 24 * 60 * 60 * 1000)); // minDeviation days from today
-    const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + room.maxDeviation); 
+    const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (room.maxDeviation || 30)); 
     // const maxDate = new Date(today.getTime() + ((room.maxDeviation) * 24 * 60 * 60 * 1000)); // maxDeviation days from today
   
     // Ensure the deviation dates fall within the booking range
@@ -87,7 +91,8 @@ export class NewReservationModalComponent implements OnInit {
     for (let date = minDate; date <= maxDate; date.setDate(date.getDate() + 1)) {
       const dayOfWeek = getDayOfWeek(date);
       let arrivals = room.arrivalDays || [];
-      if (arrivals.includes(dayOfWeek)) {
+      if (date >= stayDateFrom &&
+        date <= stayDateTo && arrivals.includes(dayOfWeek)) {
         arrivalDates.add(date.toISOString().split('T')[0]);
       }
     }
@@ -121,10 +126,14 @@ export class NewReservationModalComponent implements OnInit {
   
     this.rooms.forEach(room => {
       if (room.stayDateFrom && room.stayDateTo) {
-        const stayDateFrom = new Date(room.stayDateFrom);
-        const stayDateTo = new Date(room.stayDateTo);
-        const minStay = room.minStay ?? 0;
-        const maxStay = room.maxStay ?? Infinity;
+        // const stayDateFrom = new Date(room.stayDateFrom);
+        // const stayDateTo = new Date(room.stayDateTo);
+        // const minStay = room.minStay || 1;
+        // const maxStay = room.maxStay || 30;
+        const stayDateFrom = room.stayDateFrom ? new Date(room.stayDateFrom) : new Date();
+        const stayDateTo = room.stayDateTo ? new Date(room.stayDateTo) : new Date('2024-12-01');
+        const minStay = room.minStay || 1;
+        const maxStay = room.maxStay || 30;
   
         const minDepartureDate = new Date(arrivalDate);
         minDepartureDate.setDate(arrivalDate.getDate() + minStay);
@@ -143,7 +152,8 @@ export class NewReservationModalComponent implements OnInit {
 
         for (let currentDate = minDepartureDate; currentDate <= maxDepartureDate; currentDate.setDate(currentDate.getDate() + 1)) {
           const dayOfWeek = getDayOfWeek(currentDate);
-          if (room.departureDays?.includes(dayOfWeek)) {
+          if (currentDate >= stayDateFrom &&
+            currentDate <= stayDateTo && room.departureDays?.includes(dayOfWeek)) {
             const formattedDate = currentDate.toISOString().split('T')[0];
             if (this.checkFilteredRooms(arrivalDate, currentDate)) 
             validDepartureDates.add(formattedDate);

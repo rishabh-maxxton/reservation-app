@@ -86,6 +86,7 @@
                             'highlighted': highlightedDays[room.roomId] && highlightedDays[room.roomId].includes(day),
                            
                         }"
+                        [attr.data-user-name]="getUserName(room.roomId, day)"
                         (mousedown)="startSelection(room.roomId, day)"
                         (mouseover)="continueSelection(room.roomId, day)"
                         (mouseup)="endSelection(room.roomId, day)"

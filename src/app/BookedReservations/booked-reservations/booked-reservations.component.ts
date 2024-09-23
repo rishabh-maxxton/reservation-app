@@ -13,8 +13,14 @@ export class BookedReservationsComponent implements OnInit {
   bookingForm: FormGroup; // Form group for handling updates
   chartData: number[] = [];
   chartLabels: string[] = [];
+  pieChartData = [
+    { label: 'New', value: 4 },
+    { label: 'Confirmed', value: 5 },
+    { label: 'Checked In', value: 3 },
+    { label: 'Checked Out', value: 2 },
+    { label: 'Cancelled', value: 2 }
+  ];
   
-
   constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.bookingForm = this.fb.group({
       reservationId: [''],

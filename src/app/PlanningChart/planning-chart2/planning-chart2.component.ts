@@ -132,6 +132,17 @@ export class PlanningChart2Component implements OnInit{
     return '';
   }
 
+  getUserName(roomId: number, day: Date): string {
+    const bookings = this.getAllBookings(roomId);
+    const dayStr = day.toISOString().split('T')[0];
+    const booking = bookings.find(b => dayStr >= b.startDate.toISOString().split('T')[0] && dayStr <= b.endDate.toISOString().split('T')[0]);
+    if(booking){
+      // console.log(booking.customerName);
+      return booking.customerName;
+    }
+    return '';
+  }
+  
 
   getRoomConstraints(roomId: number): { [key: string]: { minStay: number, maxStay: number, departureDays: string[] } } {
     const constraints = this.roomConstraints1[roomId] || [];
@@ -198,23 +209,23 @@ export class PlanningChart2Component implements OnInit{
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string, totalGuests: number }> {
-    const roomBookings = this.bookings.filter(booking => {
-      const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
-      const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
-      return booking.bookingInfo.roomNo === roomId &&
-             bookingStartDate.getMonth() === month - 1 &&
-             bookingEndDate.getMonth() === month - 1;
-    });
-    return roomBookings.map(booking => ({
-      roomId: roomId,
-      startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
-      endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
-      customerName: booking.customerInfo.name,
-      status: booking.bookingInfo.status,
-      totalGuests: booking.bookingInfo.totalGuests
-    })).sort((a, b) => a.startDate - b.startDate);
-  }
+  // getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string, totalGuests: number }> {
+  //   const roomBookings = this.bookings.filter(booking => {
+  //     const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
+  //     const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
+  //     return booking.bookingInfo.roomNo === roomId &&
+  //            bookingStartDate.getMonth() === month - 1 &&
+  //            bookingEndDate.getMonth() === month - 1;
+  //   });
+  //   return roomBookings.map(booking => ({
+  //     roomId: roomId,
+  //     startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
+  //     endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
+  //     customerName: booking.customerInfo.name,
+  //     status: booking.bookingInfo.status,
+  //     totalGuests: booking.bookingInfo.totalGuests
+  //   })).sort((a, b) => a.startDate - b.startDate);
+  // }
 
   getAllBookings(roomId: number): Array<{ roomId: number, startDate: Date, endDate: Date, customerName: string, status: string, totalGuests: number }> {
     const roomBookings = this.bookings.filter(booking => {
@@ -370,6 +381,7 @@ export class PlanningChart2Component implements OnInit{
     // Return the minimum minDeviation or 0 if no valid deviations found
     return deviations.length > 0 ? Math.min(...deviations) : 0;
   }
+
   calculateMaxDev(roomId: number): number{
     const deviations = this.availability
         .filter(room => room.roomId === roomId)
@@ -389,6 +401,7 @@ export class PlanningChart2Component implements OnInit{
     today.setHours(0, 0, 0, 0);
     let minTodayDate = new Date(today.getFullYear(), today.getMonth(),today.getDate() + minDev);
     let maxTodayDate = new Date(today.getFullYear(), today.getMonth(),today.getDate() + maxDev);
+    // console.log(maxTodayDate);
     // console.log(day, minTodayDate, maxTodayDate);
     return day < minTodayDate || day > maxTodayDate;
   }
@@ -419,7 +432,7 @@ export class PlanningChart2Component implements OnInit{
 
     return constraints.some(constraint => 
       constraint.arrivalDays.includes(dayOfWeekString) &&
-      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMinMaxDev(roomId, day)
+      this.isDayAvailable(roomId, day) && !this.isStartOfBooking(roomId, day) && !this.isMinMaxDev(roomId, day) && !this.isMiddleCell(roomId, day)
     );
   }
 
@@ -511,10 +524,8 @@ export class PlanningChart2Component implements OnInit{
 
   highlightedDaysCompare(roomId: number, day: Date): boolean{
     if (!this.highlightedDays[roomId]) {
-        return false; // No dates for this roomId
+        return false;
     }
-    
-    // Format the day to string
     const formattedDay = this.formatDateToString(day);
     
     // Check if any date in highlightedDays[roomId] matches formattedDay
@@ -532,7 +543,6 @@ export class PlanningChart2Component implements OnInit{
     this.selectedDates = [day];
     this.applySelectionConstraints(roomId, day);
     this.extractRoomConstraints1();
-    console.log(this.roomConstraints1);
     this.highlightDepartureDays(roomId, day);
   }
 

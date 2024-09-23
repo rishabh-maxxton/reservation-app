@@ -38,7 +38,7 @@ color: $white-color;
 cursor: not-allowed;
 border: none;
 }
-    
+
 
 .prevDays{
     color: $white-color;
@@ -126,21 +126,40 @@ th, td {
 }
 
 // Start pseudo-element
-.start::before {
-    content: '';
-    background-color: var(--booking-color-start);
+.start::after {
+    // content: attr(data-user-name);
+    // background-color: var(--booking-color-start);
+    // display: block;
+    // position: absolute;
+    // top: 0;
+    // bottom: 0;
+    // width: 60%;
+    // margin-top: 10%;
+    // margin-bottom: 10%;
+    // padding-top: 100%;
+    // border-top-left-radius: 3px;
+    // border-bottom-left-radius: 3px;
+    // right: 0; // Position to the right
+    // color: #000000;
+    // z-index: 1;
+    content: "sssss";
     display: block;
     position: absolute;
+    color: black; 
+    text-align: left;
+    overflow: hidden; // Hide overflow
+    text-overflow: ellipsis;
     top: 0;
-    bottom: 0;
+    bottom: 0rem;
     width: 60%;
     margin-top: 10%;
     margin-bottom: 10%;
     padding-top: 100%;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
-    right: 0; // Position to the right
-    z-index: 1;
+    background-color: var(--booking-color-start);
+    right: 0;
+    z-index: 11;
 }
 
 
@@ -192,7 +211,7 @@ th, td {
 }
 
 // End pseudo-element
-.end::after {
+.end::before {
     content: '';
     display: block;
     position: absolute;

@@ -30,6 +30,7 @@ import { NewReservationModalComponent } from './NewReservationModal/new-reservat
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTableModule } from '@angular/material/table';
+import { PieChartComponent } from './pie-chart/pie-chart.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { MatTableModule } from '@angular/material/table';
     BookedReservationsComponent,
     PlanningChart2Component,
     NewReservationModalComponent,
+    PieChartComponent,
   ],
   imports: [
     BrowserModule,
