@@ -214,9 +214,9 @@
         <div class="form-group">
           <label class="required" for="paymentType">Payment Type</label>
           <mat-radio-group formControlName="paymentMode" class="form-control">
-            <mat-radio-button value="card">Credit/Debit Card</mat-radio-button>
-            <mat-radio-button value="upi">UPI</mat-radio-button>
-            <mat-radio-button value="netbanking">Net Banking</mat-radio-button>
+            <mat-radio-button value="Card">Credit/Debit Card</mat-radio-button>
+            <mat-radio-button value="Upi">UPI</mat-radio-button>
+            <mat-radio-button value="Netbanking">Net Banking</mat-radio-button>
           </mat-radio-group>
           <mat-error *ngIf="paymentForm.get('paymentType')?.invalid && paymentForm.get('paymentType')?.touched">
             Please select a payment type.
@@ -239,6 +239,7 @@
   </mat-step>
   <mat-step >
     <ng-template matStepLabel>Preview</ng-template>
+    <div>
     <div  class="current-bookings" #preview>
       <h2>Preview</h2>
       <div *ngIf="currentBooking.length > 0; else noBookings">
@@ -274,9 +275,11 @@
       <ng-template #noBookings>
         <p>No bookings available.</p>
       </ng-template>
-      <button class="download" (click)="downloadPreview()">Download</button>
+    </div>
+    <div class="download">
+      <button (click)="downloadPreview()">Download</button>
     </div>
     
-    
+  </div>
   </mat-step>
 </mat-stepper>

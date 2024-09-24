@@ -82,6 +82,13 @@
                         data-placement="bottom"
                         [attr.title]="getTooltipContent(room.roomId, day)"
                         >
+                        <!-- <span
+                            *ngIf="isStartOfBooking(room.roomId, day)"
+                            class="reservation-marker text-start ps-2"
+                            [ngStyle]="getReservationWidthandStatus(room.roomId, day)"
+                        >
+                            {{ getUserName(room.roomId, day) }}
+                        </span> -->
                     </td>
                 </ng-container>
             </tr>

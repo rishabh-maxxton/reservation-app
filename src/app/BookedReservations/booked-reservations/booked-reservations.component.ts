@@ -13,13 +13,14 @@ export class BookedReservationsComponent implements OnInit {
   bookingForm: FormGroup; // Form group for handling updates
   chartData: number[] = [];
   chartLabels: string[] = [];
-  pieChartData = [
-    { label: 'New', value: 4 },
-    { label: 'Confirmed', value: 5 },
-    { label: 'Checked In', value: 3 },
-    { label: 'Checked Out', value: 2 },
-    { label: 'Cancelled', value: 2 }
-  ];
+  // pieChartData = [
+  //   { label: 'New', value: 4 },
+  //   { label: 'Confirmed', value: 5 },
+  //   { label: 'Checked In', value: 3 },
+  //   { label: 'Checked Out', value: 2 },
+  //   { label: 'Cancelled', value: 2 }
+  // ];
+  monthlyBookings: number[] = Array(12).fill(0);
   
   constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.bookingForm = this.fb.group({
@@ -30,7 +31,16 @@ export class BookedReservationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBookings();
-    this.prepareChartData();
+    // this.prepareChartData();
+    this.calculateMonthlyBookings();
+  }
+
+  calculateMonthlyBookings() {
+    this.bookings.forEach(booking => {
+      const bookingDate = new Date(booking.stayDateFrom); // Assuming stayDateFrom is the booking date
+      const month = bookingDate.getMonth(); // Get the month (0-11)
+      this.monthlyBookings[month]++; // Increment the count for that month
+    });
   }
 
   loadBookings() {
@@ -50,25 +60,6 @@ export class BookedReservationsComponent implements OnInit {
         }
       }
     }
-  }
-
-
-  prepareChartData() {
-    let statusCounts: any = {
-      "New": 0,
-      "Confirmed": 0,
-      "Checked In": 0,
-      "Due In": 0,
-      "Checked Out": 0,
-      "Cancelled": 0,
-    };
-
-    this.bookings.forEach(booking => {
-      statusCounts[booking.status]++;
-    });
-
-    this.chartLabels = Object.keys(statusCounts);
-    this.chartData = Object.values(statusCounts);
   }
 
   updateStatus(index: number, status: string) {

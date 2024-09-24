@@ -4,7 +4,6 @@
   import moment from 'moment';
   import { RoomServiceService } from '../../Service/room-service.service';
   import jsPDF from 'jspdf';
-  import html2canvas from 'html2canvas';
 
   @Component({
     selector: 'app-booking-form',
@@ -12,7 +11,6 @@
     styleUrls: ['./booking-form.component.scss']
   })
   export class BookingFormComponent implements OnInit {
-    @ViewChild('preview', { static: false }) previewElement!: ElementRef;
     userTypeFormGroup: FormGroup;
     bookingForm: FormGroup;
     customerForm: FormGroup;
@@ -126,42 +124,101 @@
       this.updateTotalPrice();
     }
 
+    
     downloadPreview() {
-      if (this.previewElement) {
-        const data = this.previewElement.nativeElement;
-    
-        html2canvas(data).then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF();
-    
-          // Calculate width and height for the image in the PDF
-          const imgWidth = pdf.internal.pageSize.getWidth();
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-          // Check if the image height exceeds the page height
-          const pageHeight = pdf.internal.pageSize.getHeight();
-          let heightLeft = imgHeight;
-    
-          let position = 0;
-    
-          // Add the image to the PDF, page by page if necessary
-          while (heightLeft >= 0) {
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-            position -= pageHeight; // Move down for the next page
-    
-            // If there's still content, add a new page
-            if (heightLeft >= 0) {
-              pdf.addPage();
-            }
-          }
-    
-          pdf.save('preview.pdf');
-        });
-      } else {
-        console.error('Preview element not found');
+      if (this.currentBooking.length === 0) {
+        console.error('No bookings available for download.');
+        return;
       }
+    
+      this.currentBooking.forEach((bookingData) => {
+        const pdf = new jsPDF();
+    
+        // Header
+        pdf.setFillColor(220, 220, 220); // Light grey
+        pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), 30, 'F');
+        pdf.setFontSize(20);
+        pdf.setTextColor(0); // Black text
+        pdf.text('Invoice', 14, 20);
+    
+        // Add space before customer information
+        pdf.setFontSize(12);
+        pdf.setTextColor(0); // Reset to black
+        
+        // Customer Information
+        pdf.setFont("helvetica", "bold"); // Set font to bold
+        pdf.text('Booking Information', 14, 40);
+        pdf.setFont("helvetica", "normal"); // Set font back to normal
+        
+        // Booking Information
+        const bookingInfo = [
+          `Reservation ID: ${bookingData.bookingInfo.reservationId}`,
+          `Room No: ${bookingData.bookingInfo.roomNo}`,
+          `Stay Date From: ${bookingData.bookingInfo.stayDateFrom}`,
+          `Stay Date To: ${bookingData.bookingInfo.stayDateTo}`,
+          `Number of Days: ${bookingData.bookingInfo.numberOfDays}`,
+          `Total Guests: ${bookingData.bookingInfo.totalGuests}`,
+          `Price Per Day/Person: ${bookingData.bookingInfo.pricePerDayPerPerson}`,
+          `Total Price: ${bookingData.bookingInfo.totalPrice}`,
+          `Status: ${bookingData.bookingInfo.status}`
+        ];
+    
+        let y = 50; // Starting position for customer info
+        bookingInfo.forEach(line => {
+          pdf.text(line, 14, y);
+          y += 10; // Increment y position
+        });
+    
+        // Add space before booking information
+        pdf.setFont("helvetica", "bold");
+        pdf.text('Customer Information', 14, y);
+        pdf.setFont("helvetica", "normal");
+        y += 10;
+    
+        // Booking Information
+        
+        const customerInfo = [
+          `Customer ID: ${bookingData.customerInfo.customerId}`,
+          `Name: ${bookingData.customerInfo.name}`,
+          `Email: ${bookingData.customerInfo.email}`,
+          `Mobile Number: ${bookingData.customerInfo.mobileNumber}`,
+          `Age: ${bookingData.customerInfo.age}`,
+          `Birth Date: ${bookingData.customerInfo.birthDate}`,
+          `Address: ${bookingData.customerInfo.initialAddress}, ${bookingData.customerInfo.city}, ${bookingData.customerInfo.state}, ${bookingData.customerInfo.country}, ${bookingData.customerInfo.pincode}`
+        ];
+
+        customerInfo.forEach(line => {
+          pdf.text(line, 14, y);
+          y += 10; // Increment y position
+        });
+    
+        
+    
+        // Add space before payment information
+        pdf.setFont("helvetica", "bold");
+        pdf.text('Payment Information', 14, y);
+        pdf.setFont("helvetica", "normal");
+        y += 10;
+    
+        // Payment Information
+        const paymentInfo = [
+          `Payment ID: ${bookingData.paymentInfo.paymentId}`,
+          `Payment Mode: ${bookingData.paymentInfo.paymentMode}`,
+          `Paid Amount: ${bookingData.paymentInfo.paidAmount}`,
+          `Due Amount: ${bookingData.paymentInfo.dueAmount}`
+        ];
+    
+        paymentInfo.forEach(line => {
+          pdf.text(line, 14, y);
+          y += 10; // Increment y position
+        });
+    
+        // Finalize and save the PDF
+        pdf.save(`Invoice_${bookingData.bookingInfo.reservationId}.pdf`);
+      });
     }
+    
+    
     
 
     guestCapacityValidator(control: AbstractControl): ValidationErrors | null {

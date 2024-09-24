@@ -132,6 +132,37 @@ export class PlanningChart2Component implements OnInit{
     return '';
   }
 
+  getReservationWidthandStatus(roomId: number, day: Date){
+    const bookings = this.getAllBookings(roomId);
+    const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
+    const reservationLength = booking ? booking.numberOfDays : 1;
+    // const bookDateFrom = booking.numberOfDays;
+    const spanWidth = reservationLength*100;
+    
+    let backgroundColor = 'green';
+    // if (booking) {
+    //   switch (booking.status) {
+    //     case 'Confirmed':
+    //       backgroundColor = 'coral';
+    //       break;
+    //     case 'Check-In':
+    //       backgroundColor = 'lightgreen';
+    //       break;
+    //     case 'Check-Out':
+    //       backgroundColor = 'lightblue';
+    //       break;
+    //     default:
+    //       backgroundColor = 'gray';
+    //       break;
+    //   }
+    // }
+
+    return {
+      width: `${spanWidth}%`,
+      backgroundColor: backgroundColor
+    };
+  }
+
   getUserName(roomId: number, day: Date): string {
     const bookings = this.getAllBookings(roomId);
     const dayStr = day.toISOString().split('T')[0];
@@ -142,7 +173,7 @@ export class PlanningChart2Component implements OnInit{
     }
     return '';
   }
-  
+
 
   getRoomConstraints(roomId: number): { [key: string]: { minStay: number, maxStay: number, departureDays: string[] } } {
     const constraints = this.roomConstraints1[roomId] || [];
@@ -170,6 +201,7 @@ export class PlanningChart2Component implements OnInit{
       });
     });
     return constraintMap;
+    
   }
 
   formatDate(date: Date): string {
@@ -227,7 +259,7 @@ export class PlanningChart2Component implements OnInit{
   //   })).sort((a, b) => a.startDate - b.startDate);
   // }
 
-  getAllBookings(roomId: number): Array<{ roomId: number, startDate: Date, endDate: Date, customerName: string, status: string, totalGuests: number }> {
+  getAllBookings(roomId: number): Array<{ roomId: number, startDate: Date, endDate: Date, customerName: string, numberOfDays: number, status: string, totalGuests: number }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
@@ -239,6 +271,7 @@ export class PlanningChart2Component implements OnInit{
       roomId: roomId,
       startDate: new Date(booking.bookingInfo.stayDateFrom),
       endDate: new Date(booking.bookingInfo.stayDateTo),
+      numberOfDays: booking.bookingInfo.numberOfDays,
       customerName: booking.customerInfo.name,
       status: booking.bookingInfo.status,
       totalGuests: booking.bookingInfo.totalGuests
@@ -502,6 +535,17 @@ export class PlanningChart2Component implements OnInit{
 
     return validDepartureDays;
   }
+
+  
+
+  // getUserName(roomId: number, day: number): string {
+  //   const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+  //   const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
+  //   if(booking){
+  //     return booking.customerName;
+  //   }
+  //   return '';
+  // }
   
 
   getDaysInMonth(month: number, year: number): number {
@@ -538,6 +582,7 @@ export class PlanningChart2Component implements OnInit{
       this.highlightedDays[roomId] = [];
       return;
     }
+
     this.isSelecting = true;
     this.selectedRoomId = roomId;
     this.selectedDates = [day];
@@ -552,14 +597,13 @@ export class PlanningChart2Component implements OnInit{
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-}
+  }
 
   selctedDateCompare(day: Date): boolean {
     const formattedDay = this.formatDateToString(day);
     return this.selectedDates.some(date => this.formatDateToString(date) === formattedDay);
   }
   
-
   continueSelection(roomId: number, day: Date) {
     if(!this.isDayAvailable(roomId, day) || this.isEndOfBooking(roomId, day) || this.isMiddleCell(roomId, day)){
       this.selectedRoomId = 0;

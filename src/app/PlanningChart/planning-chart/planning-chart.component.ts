@@ -79,15 +79,6 @@ export class PlanningChartComponent implements OnInit {
     return '';
   }
 
-  getUserName(roomId: number, day: number): string {
-    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
-    const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
-    if(booking){
-      return booking.customerName;
-
-    }
-    return '';
-  }
 
 
   ngOnInit(): void {
@@ -246,7 +237,7 @@ export class PlanningChartComponent implements OnInit {
     })).sort((a, b) => a.roomId - b.roomId);
   }
 
-  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number, customerName: string, status: string, totalGuests: number }> {
+  getRoomBookingsForMonth(roomId: number, month: number): Array<{ roomId: number, startDate: number, endDate: number,numberOfDays: number, customerName: string, status: string, totalGuests: number }> {
     const roomBookings = this.bookings.filter(booking => {
       const bookingStartDate = new Date(booking.bookingInfo.stayDateFrom);
       const bookingEndDate = new Date(booking.bookingInfo.stayDateTo);
@@ -258,6 +249,7 @@ export class PlanningChartComponent implements OnInit {
       roomId: roomId,
       startDate: new Date(booking.bookingInfo.stayDateFrom).getDate(),
       endDate: new Date(booking.bookingInfo.stayDateTo).getDate(),
+      numberOfDays: booking.bookingInfo.numberOfDays,
       customerName: booking.customerInfo.name,
       status: booking.bookingInfo.status,
       totalGuests: booking.bookingInfo.totalGuests
@@ -531,6 +523,47 @@ isMiddleCell(roomId: number, day: number): boolean {
     // Set highlighted days for the specific room
     this.highlightedDays[roomId] = daysToHighlight;
   }
+
+  
+  getReservationWidthandStatus(roomId: number, day: number){
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
+    const reservationLength = booking ? booking.numberOfDays : 1;
+    // const bookDateFrom = booking.numberOfDays;
+    const spanWidth = reservationLength*100;
+    
+    let backgroundColor = 'green';
+    // if (booking) {
+    //   switch (booking.status) {
+    //     case 'Confirmed':
+    //       backgroundColor = 'coral';
+    //       break;
+    //     case 'Check-In':
+    //       backgroundColor = 'lightgreen';
+    //       break;
+    //     case 'Check-Out':
+    //       backgroundColor = 'lightblue';
+    //       break;
+    //     default:
+    //       backgroundColor = 'gray';
+    //       break;
+    //   }
+    // }
+
+    return {
+      width: `${spanWidth}%`,
+      backgroundColor: backgroundColor
+    };
+  }
+
+  getUserName(roomId: number, day: number): string {
+    const bookings = this.getRoomBookingsForMonth(roomId, this.selectedMonth);
+    const booking = bookings.find(b => day >= b.startDate && day <= b.endDate);
+    if(booking){
+      return booking.customerName;
+    }
+    return '';
+  }
   
   startSelection(roomId: number, day: number) {
     if (!this.isArrivalDay(roomId, day) || this.isStartOfBooking(roomId, day) || this.isMiddleCell(roomId, day))
@@ -539,6 +572,8 @@ isMiddleCell(roomId: number, day: number): boolean {
         this.highlightedDays[roomId] = [];
         return;
       } 
+
+      this.getReservationWidthandStatus(roomId, day);
   
     this.isSelecting = true;
     this.selectedRoomId = roomId;

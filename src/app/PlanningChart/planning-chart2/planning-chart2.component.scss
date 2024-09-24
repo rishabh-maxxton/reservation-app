@@ -228,6 +228,17 @@ th, td {
     z-index: 3;
 }
 
+.reservation-marker {
+    position: absolute;
+    height: 70%; 
+    background-color: coral; 
+    border-radius: 2px; 
+    display: inline-block; 
+    z-index: 5;
+    padding-top: 10%;
+    overflow: hidden;
+  }
+
 
 
 

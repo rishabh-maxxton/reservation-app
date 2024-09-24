@@ -167,7 +167,20 @@ th, td {
     position: relative; // For positioning pseudo-elements
     margin: 10px; // Small margin to create separation between cells
     overflow: hidden; // Ensure content doesn’t overflow the rounded corners
+    z-index: 0; 
 }
+
+// .reservation-marker {
+//     position: absolute;
+//     height: 70%;     
+//     background-color: coral; 
+//     border-radius: 2px; 
+//     display: inline-block; 
+//     z-index: 5;
+//     padding-bottom: 70rem;
+//     // padding-top:;
+//     overflow: hidden;
+// }
 
 
 .start {
@@ -264,6 +277,8 @@ th, td {
     padding-bottom: 3.75rem;
     overflow: hidden; // To ensure the pseudo-element is contained
 }
+
+
 
 // End pseudo-element
 .end::before {
